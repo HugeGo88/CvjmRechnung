@@ -22,7 +22,8 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <StackPanel>
                 <Label Content="Vor- und Nachname" />
@@ -47,13 +48,18 @@
                 Content="Zeile hinzufügen" />
             <DataGrid Grid.Row="5">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="#" />
+                    <DataGridTextColumn Header="#" IsReadOnly="True" />
                     <DataGridTextColumn Header="Anzahl" />
+                    <DataGridTextColumn Header="Einheit" />
                     <DataGridTextColumn Width="*" Header="Position" />
                     <DataGridTextColumn Header="Einselpreis" />
-                    <DataGridTextColumn Header="Gesamtpreis" />
+                    <DataGridTextColumn Header="Gesamtpreis" IsReadOnly="True" />
                 </DataGrid.Columns>
             </DataGrid>
+            <StackPanel Grid.Row="6" Orientation="Horizontal">
+                <Label Content="Summe" FontStyle="Oblique" />
+                <Label Content="100" FontStyle="Oblique" />
+            </StackPanel>
         </Grid>
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
