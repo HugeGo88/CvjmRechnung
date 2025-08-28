@@ -16,12 +16,32 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
                 <RowDefinition />
             </Grid.RowDefinitions>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Label 1" />
-                <TextBlock  Text="Hugo" />
+            <StackPanel>
+                <Label Content="Vor- und Nachname" />
+                <TextBox />
             </StackPanel>
+            <StackPanel Grid.Row="1">
+                <Label Content="Straße und Hausnummer" />
+                <TextBox />
+            </StackPanel>
+            <StackPanel Grid.Row="2">
+                <Label Content="PLZ und Ort" />
+                <TextBox />
+            </StackPanel>
+            <DataGrid Grid.Row="3">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="#">
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Anzahl"/>
+                    <DataGridTextColumn Header="Position" Width="*">
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Einselpreis"></DataGridTextColumn>
+                    <DataGridTextColumn Header="Gesamtpreis"/>
+                </DataGrid.Columns>
+            </DataGrid>
         </Grid>
     </Grid>
 </Window>
