@@ -4,11 +4,15 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:CvjmRechnung"
+    xmlns:vm="clr-namespace:CvjmRechnung.ViewModel"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    Title="MainWindow"
-    Width="800"
-    Height="450"
+    Title="CVJM Rechnung"
+    Width="1200"
+    Height="800"
     mc:Ignorable="d">
+    <Window.DataContext>
+        <vm:MainWindowViewModel />
+    </Window.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -45,9 +49,9 @@
                 Grid.Row="4"
                 Margin="0,10"
                 HorizontalAlignment="Right"
-                Command="{Binding AddRow}"
+                Command="{Binding AddRowCommand}"
                 Content="Zeile hinzufügen" />
-            <DataGrid Grid.Row="5" ItemsSource="{Binding InvoiceRows}">
+            <DataGrid Grid.Row="5" ItemsSource="{Binding InvoiceRows, UpdateSourceTrigger=PropertyChanged}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="#" IsReadOnly="True" />
                     <DataGridTextColumn Header="Anzahl" />
