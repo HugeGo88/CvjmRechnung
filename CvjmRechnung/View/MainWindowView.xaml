@@ -27,26 +27,27 @@
             </Grid.RowDefinitions>
             <StackPanel>
                 <Label Content="Vor- und Nachname" />
-                <TextBox />
+                <TextBox Text="{Binding FirstAndLastName}" />
             </StackPanel>
             <StackPanel Grid.Row="1">
                 <Label Content="Straße und Hausnummer" />
-                <TextBox />
+                <TextBox Text="{Binding StreetAndNumber}" />
             </StackPanel>
             <StackPanel Grid.Row="2">
                 <Label Content="PLZ und Ort" />
-                <TextBox />
+                <TextBox Text="{Binding PostalCodeAndCity}" />
             </StackPanel>
             <StackPanel Grid.Row="3">
                 <Label Content="Email" />
-                <TextBox />
+                <TextBox Text="{Binding EmailAddress}" />
             </StackPanel>
             <Button
                 Grid.Row="4"
                 Margin="0,10"
                 HorizontalAlignment="Right"
+                Command="{Binding AddRow}"
                 Content="Zeile hinzufügen" />
-            <DataGrid Grid.Row="5">
+            <DataGrid Grid.Row="5" ItemsSource="{Binding InvoiceRows}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="#" IsReadOnly="True" />
                     <DataGridTextColumn Header="Anzahl" />
