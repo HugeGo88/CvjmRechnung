@@ -4,8 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:CvjmRechnung"
-    xmlns:vm="clr-namespace:CvjmRechnung.ViewModel"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:CvjmRechnung.ViewModel"
     Title="CVJM Rechnung"
     Width="1200"
     Height="800"
@@ -15,56 +15,90 @@
     </Window.DataContext>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="0" />
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <StackPanel>
+            <StackPanel Margin="5">
+                <Label Content="Reservierungs- oder Rechnungsnummer" />
+                <TextBox Text="{Binding OrderNumber}" />
                 <Label Content="Vor- und Nachname" />
                 <TextBox Text="{Binding FirstAndLastName}" />
-            </StackPanel>
-            <StackPanel Grid.Row="1">
                 <Label Content="Straße und Hausnummer" />
                 <TextBox Text="{Binding StreetAndNumber}" />
-            </StackPanel>
-            <StackPanel Grid.Row="2">
                 <Label Content="PLZ und Ort" />
                 <TextBox Text="{Binding PostalCodeAndCity}" />
-            </StackPanel>
-            <StackPanel Grid.Row="3">
                 <Label Content="Email" />
                 <TextBox Text="{Binding EmailAddress}" />
+                <Label Content="Rechnungsdatum" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <DatePicker FirstDayOfWeek="Monday" SelectedDate="{Binding Date}" />
+                    <Button
+                        Grid.Column="1"
+                        Command="{Binding SetCurrentDateCommand}"
+                        Content="Heute" />
+                </Grid>
+                <Label Content="Mietgegenstände" />
+                <ComboBox ItemsSource="{Binding Rents}" SelectedItem="{Binding Rent}" />
+                <CheckBox Margin="0,7,0,0" IsChecked="{Binding IsMember}">
+                    <TextBlock Text="Ist Mitglied" />
+                </CheckBox>
+                <Button
+                    Grid.Row="4"
+                    Margin="0,10"
+                    HorizontalAlignment="Right"
+                    Command="{Binding AddRowCommand}"
+                    Content="Zeile hinzufügen" />
             </StackPanel>
-            <Button
-                Grid.Row="4"
-                Margin="0,10"
-                HorizontalAlignment="Right"
-                Command="{Binding AddRowCommand}"
-                Content="Zeile hinzufügen" />
-            <DataGrid Grid.Row="5" ItemsSource="{Binding InvoiceRows, UpdateSourceTrigger=PropertyChanged}">
+            <DataGrid
+                Grid.Row="1"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False"
+                ItemsSource="{Binding InvoiceRows, UpdateSourceTrigger=PropertyChanged}">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="#" IsReadOnly="True" />
-                    <DataGridTextColumn Header="Anzahl" />
-                    <DataGridTextColumn Header="Einheit" />
-                    <DataGridTextColumn Width="*" Header="Position" />
-                    <DataGridTextColumn Header="Einselpreis" />
-                    <DataGridTextColumn Header="Gesamtpreis" IsReadOnly="True" />
+                    <DataGridTextColumn
+                        Binding="{Binding Path=Position}"
+                        Header="#"
+                        IsReadOnly="True" />
+                    <DataGridTextColumn Binding="{Binding Path=Quantity}" Header="Anzahl" />
+                    <DataGridTextColumn Binding="{Binding Path=UnitPrice}" Header="Einheit" />
+                    <DataGridTextColumn
+                        Width="*"
+                        Binding="{Binding Path=Description}"
+                        Header="Beschreibung" />
+                    <DataGridTextColumn Binding="{Binding Path=UnitPrice}" Header="Einselpreis" />
+                    <DataGridTextColumn
+                        Binding="{Binding Path=TotalPrice}"
+                        Header="Gesamtpreis"
+                        IsReadOnly="True" />
                 </DataGrid.Columns>
             </DataGrid>
-            <StackPanel Grid.Row="6" Orientation="Horizontal">
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
                 <Label Content="Summe" FontStyle="Oblique" />
-                <Label Content="100" FontStyle="Oblique" />
-            </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Label Content="{Binding TotalAmount}" FontWeight="Bold" />
+                    <Label Content="€" FontStyle="Oblique" />
+                </StackPanel>
+                <Button
+                    Grid.Column="2"
+                    Command="{Binding SaveFileCommand}"
+                    Content="Speichern" />
+            </Grid>
         </Grid>
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
