@@ -2,12 +2,10 @@
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Web.WebView2.WinForms;
-using SimpleHtmlToPdf;
+using Microsoft.Win32;
 using SimpleHtmlToPdf.Interfaces;
-using SimpleHtmlToPdf.Settings;
-using SimpleHtmlToPdf.Settings.Enums;
-using SimpleHtmlToPdf.UnmanagedHandler;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 
 namespace CvjmRechnung.ViewModel
@@ -83,31 +81,48 @@ namespace CvjmRechnung.ViewModel
             PdfPath = $"{Directory.GetCurrentDirectory()}\\test.pdf";
             var Converter = App.Current.Services.GetService<IConverter>();
             string content = GetHtmlCodeForInvoice();
-            var doc = new HtmlToPdfDocument()
-            {
-                GlobalSettings = {
-                 // Color mode of the output file
-                 ColorMode = ColorMode.Color,
-                 // Orientation of the output file
-                 Orientation = Orientation.Portrait,
-                 // Paper size of the output file
-                 PaperSize = PaperKind.A4,
-             },
-                Objects = {
-                 new ObjectSettings()
-                 {
-             
-                     // HTML content to convert
-                     HtmlContent = content,
-                     // The default encoding used.
-                     WebSettings = { DefaultEncoding = "utf-8" },
-                 },
-                   }
-            };
+            RenderPdf(content);
+        }
 
-            var pdf = Converter.Convert(doc);
-            File.WriteAllBytes($"{Directory.GetCurrentDirectory()}\\Rechnung_{OrderNumber}.pdf", pdf);
-            PdfPath = $"{Directory.GetCurrentDirectory()}\\Rechnung_{OrderNumber}.pdf";
+        private void RenderPdf(string content)
+        {
+            File.WriteAllText($"{Directory.GetCurrentDirectory()}\\temp.html", content);
+
+            string pathToExe = getPathForExe("msedge.exe");
+            ProcessStartInfo ps = new ProcessStartInfo()
+            {
+                FileName = pathToExe,
+                Arguments = $"--headless --disable-gpu --print-to-pdf-no-header --run-all-compositor-stages-before-draw --virtual-time-budget=5000 --print-to-pdf=\"{Directory.GetCurrentDirectory()}\\Rechnung_{OrderNumber}.pdf\" \"{Directory.GetCurrentDirectory()}\\temp.html\"",
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+            Process converter = Process.Start(ps);
+            if (!converter.WaitForExit(5000))
+            {
+                converter.Kill();
+            }
+            if (converter.ExitCode != 0)
+            {
+                Console.WriteLine("An error occured!");
+            }
+            else
+            {
+                PdfPath = $"{Directory.GetCurrentDirectory()}\\Rechnung_{OrderNumber}.pdf";
+            }
+        }
+
+        private string getPathForExe(string fileName)
+        {
+            string keyBase = @"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths";
+            RegistryKey localMachine = Registry.LocalMachine;
+            RegistryKey fileKey = localMachine.OpenSubKey(String.Format(@"{0}\{1}", keyBase, fileName));
+            object result = null;
+            if (fileKey != null)
+            {
+                result = fileKey.GetValue(String.Empty);
+                fileKey.Close();
+            }
+            return (string)result;
         }
 
         private string GetHtmlCodeForInvoice()
