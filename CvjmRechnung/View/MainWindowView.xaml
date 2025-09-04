@@ -72,7 +72,7 @@
                         Header="#"
                         IsReadOnly="True" />
                     <DataGridTextColumn Binding="{Binding Path=Quantity}" Header="Anzahl" />
-                    <DataGridTextColumn Binding="{Binding Path=UnitPrice}" Header="Einheit" />
+                    <DataGridTextColumn Binding="{Binding Path=Unit}" Header="Einheit" />
                     <DataGridTextColumn
                         Width="*"
                         Binding="{Binding Path=Description}"

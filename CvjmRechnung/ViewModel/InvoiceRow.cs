@@ -1,11 +1,21 @@
-﻿namespace CvjmRechnung.ViewModel
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace CvjmRechnung.ViewModel
 {
-    internal class InvoiceRow
+    internal partial class InvoiceRow : ObservableObject
     {
-        public int Position { get; set; } = 1;
-        public int Quantity { get; set; } = 1;
-        public string Description { get; set; } = "Vereinsheim Miete pro Tag";
-        public double UnitPrice { get; set; } = 200;
+        [ObservableProperty]
+        public int position = 1;
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TotalPrice))]
+        public int quantity = 1;
+        [ObservableProperty]
+        public string description = "Vereinsheim Miete pro Tag";
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TotalPrice))]
+        public double unitPrice = 200;
+        [ObservableProperty]
+        public string unit = "Tage";
         public double TotalPrice => Quantity * UnitPrice;
     }
 }

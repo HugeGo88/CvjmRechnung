@@ -51,16 +51,18 @@ namespace CvjmRechnung.ViewModel
         string rent = "Vereinsheim";
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(TotalAmount))]
         ObservableCollection<InvoiceRow> invoiceRows = new();
 
-        [ObservableProperty]
-        double totalAmount = 0;
+        public double TotalAmount => InvoiceRows.Sum(x =>
+        {
+            return x.TotalPrice;
+        });
 
         [RelayCommand]
         void AddRow()
         {
             InvoiceRows.Add(new InvoiceRow() { Position = InvoiceRows.Count + 1 });
-            TotalAmount = InvoiceRows.Sum(x => x.TotalPrice);
         }
 
         [RelayCommand]
