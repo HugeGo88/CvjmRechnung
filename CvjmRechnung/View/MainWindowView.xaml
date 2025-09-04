@@ -51,9 +51,9 @@
                 </Grid>
                 <Label Content="Mietgegenstände" />
                 <ComboBox ItemsSource="{Binding Rents}" SelectedItem="{Binding Rent}" />
-                <CheckBox Margin="0,7,0,0" IsChecked="{Binding IsMember}">
+                <!--<CheckBox Margin="0,7,0,0" IsChecked="{Binding IsMember}">
                     <TextBlock Text="Ist Mitglied" />
-                </CheckBox>
+                </CheckBox>-->
                 <Button
                     Grid.Row="4"
                     Margin="0,10"
