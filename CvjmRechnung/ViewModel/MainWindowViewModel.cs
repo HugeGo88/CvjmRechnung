@@ -24,19 +24,19 @@ namespace CvjmRechnung.ViewModel
         WebView2 webView = new WebView2();
 
         [ObservableProperty]
-        string orderNumber = "";
+        string orderNumber = "000";
 
         [ObservableProperty]
-        string firstAndLastName = "";
+        string firstAndLastName = "Max Mustermann";
 
         [ObservableProperty]
-        string streetAndNumber = "";
+        string streetAndNumber = "Musterstraße 123";
 
         [ObservableProperty]
-        string postalCodeAndCity = "";
+        string postalCodeAndCity = "12345 Muststadt";
 
         [ObservableProperty]
-        string emailAddress = "";
+        string emailAddress = "max@musterman.de";
 
         [ObservableProperty]
         DateTime? date = DateTime.Now;
@@ -76,7 +76,7 @@ namespace CvjmRechnung.ViewModel
         }
 
         [RelayCommand]
-        async Task GeneratePdf()
+        void GeneratePdf()
         {
             PdfPath = $"{Directory.GetCurrentDirectory()}\\test.pdf";
             var Converter = App.Current.Services.GetService<IConverter>();
@@ -129,6 +129,7 @@ namespace CvjmRechnung.ViewModel
         {
             string content = File.ReadAllText("resources/index.html");
             content = content.Replace("{ADDRESS_FIELD}", File.ReadAllText("resources/addressField.html"));
+            content = content.Replace("{CONTENT}", File.ReadAllText("resources/table.html"));
             content = content.Replace("{ADDRESS_COMPANY}", "");
             content = content.Replace("{CLUB_NAME}", "CVJM Walheim");
             content = content.Replace("{CLUB_STREET}", "Auf der Burg 6");
