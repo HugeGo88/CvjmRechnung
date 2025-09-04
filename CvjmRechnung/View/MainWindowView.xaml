@@ -6,6 +6,7 @@
     xmlns:local="clr-namespace:CvjmRechnung"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:CvjmRechnung.ViewModel"
+    xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     Title="CVJM Rechnung"
     Width="1200"
     Height="800"
@@ -107,6 +108,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <Button Command="{Binding GeneratePdfCommand}" Content="PDF erzeugen" />
+            <wpf:WebView2 Grid.Row="1" Source="{Binding PdfPath}" />
             <Button Grid.Row="2" Content="Rechnung via Email senden" />
         </Grid>
     </Grid>
