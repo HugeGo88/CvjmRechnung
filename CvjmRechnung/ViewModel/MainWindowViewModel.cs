@@ -7,6 +7,7 @@ using Microsoft.Win32;
 using SimpleHtmlToPdf.Interfaces;
 using System.Diagnostics;
 using System.IO;
+using System.Xml;
 
 namespace CvjmRechnung.ViewModel
 {
@@ -112,8 +113,8 @@ namespace CvjmRechnung.ViewModel
         {
             string content = File.ReadAllText("resources/index.html");
             content = content.Replace("{ADDRESS_FIELD}", File.ReadAllText("resources/addressField.html"));
-            content = content.Replace("{CONTENT}", File.ReadAllText("resources/table.html"));
-            content = content.Replace("{ADDRESS_COMPANY}", "");
+            content = content.Replace("{CONTENT}", CreateInvoiceTableHtml(InvoiceData.InvoiceRows.ToList()));
+            content = content.Replace("{ADDRESS_COMPANY}", InvoiceData.CompanyName);
             content = content.Replace("{CLUB_NAME}", "CVJM Walheim");
             content = content.Replace("{CLUB_STREET}", "Auf der Burg 6");
             content = content.Replace("{CLUB_CITY}", "Walheim");
@@ -132,6 +133,72 @@ namespace CvjmRechnung.ViewModel
             content = content.Replace("{DATE}", InvoiceData.Date.HasValue ? InvoiceData.Date.Value.ToString("dd MMMM yyyy") : "");
             File.WriteAllText("test.html", content);
             return content;
+        }
+
+        public string CreateInvoiceTableHtml(List<InvoiceRow> rows)
+        {
+            var xmlDoc = new XmlDocument();
+
+            // Create <table> element
+            var table = xmlDoc.CreateElement("table");
+            var h1 = xmlDoc.CreateElement("h1");
+            h1.InnerText = $"Rechnung {InvoiceData.OrderNumber}";
+            table.AppendChild(h1);
+            table.SetAttribute("style", "font-family:'Source Sans Pro',sans-serif; font-size:11pt; width:100%; border-collapse:collapse;");
+
+            // Create <thead>
+            var thead = xmlDoc.CreateElement("thead");
+            var trHead = xmlDoc.CreateElement("tr");
+            string[] headers = { "#", "Anzahl", "Einheit", "Position", "Einzelpreis", "Gesamtpreis" };
+            foreach (var header in headers)
+            {
+                var th = xmlDoc.CreateElement("th");
+                th.SetAttribute("style", "padding:8px; text-align:right;");
+                th.InnerText = header;
+                trHead.AppendChild(th);
+            }
+            thead.AppendChild(trHead);
+            table.AppendChild(thead);
+
+            foreach (var row in rows)
+            {
+                // Create <tbody>
+                var tbody = xmlDoc.CreateElement("tbody");
+                var trBody = xmlDoc.CreateElement("tr");
+                string[] rowValues = { row.Position.ToString(), row.Quantity.ToString(), row.Unit, row.Description, $"{row.UnitPrice} EUR", $"{row.TotalPrice} EUR" };
+                foreach (var value in rowValues)
+                {
+                    var td = xmlDoc.CreateElement("td");
+                    td.SetAttribute("style", "padding:8px; text-align:right;");
+                    td.InnerText = value;
+                    trBody.AppendChild(td);
+                }
+                tbody.AppendChild(trBody);
+                table.AppendChild(tbody);
+
+            }
+            // Create <tfoot>
+            var tfoot = xmlDoc.CreateElement("tfoot");
+            var trFoot = xmlDoc.CreateElement("tr");
+            var tdSumLabel = xmlDoc.CreateElement("td");
+            tdSumLabel.SetAttribute("colspan", "5");
+            tdSumLabel.SetAttribute("style", "padding:8px; text-align:right; font-weight:bold; text-align:right;");
+            tdSumLabel.InnerText = "Summe";
+            trFoot.AppendChild(tdSumLabel);
+
+            var tdSumValue = xmlDoc.CreateElement("td");
+            tdSumValue.SetAttribute("style", "padding:8px; font-weight:bold; text-align:right;");
+            tdSumValue.InnerText = $"{TotalAmount} EUR";
+            trFoot.AppendChild(tdSumValue);
+
+            tfoot.AppendChild(trFoot);
+            table.AppendChild(tfoot);
+
+            // Add table to document
+            xmlDoc.AppendChild(table);
+
+            // Return HTML string
+            return xmlDoc.OuterXml;
         }
     }
 }

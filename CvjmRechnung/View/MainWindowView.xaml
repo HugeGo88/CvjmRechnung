@@ -73,7 +73,7 @@
                     <i:EventTrigger EventName="CellEditEnding">
                         <i:InvokeCommandAction Command="{Binding CaculatePriceCommand}" />
                     </i:EventTrigger>
-                    <i:EventTrigger EventName="CurrentCellChanged">
+                    <i:EventTrigger EventName="SelectionChanged">
                         <i:InvokeCommandAction Command="{Binding CaculatePriceCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
@@ -88,7 +88,7 @@
                         Width="*"
                         Binding="{Binding Path=Description}"
                         Header="Beschreibung" />
-                    <DataGridTextColumn Binding="{Binding Path=UnitPrice}" Header="Einselpreis" />
+                    <DataGridTextColumn Binding="{Binding Path=UnitPrice}" Header="Einzelpreis" />
                     <DataGridTextColumn
                         Binding="{Binding Path=TotalPrice}"
                         Header="Gesamtpreis"
