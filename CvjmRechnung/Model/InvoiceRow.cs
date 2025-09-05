@@ -2,7 +2,7 @@
 
 namespace CvjmRechnung.ViewModel
 {
-    internal partial class InvoiceRow : ObservableObject
+    public partial class InvoiceRow : ObservableObject
     {
         [ObservableProperty]
         public int position = 1;

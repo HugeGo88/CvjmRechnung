@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Win32;
 using SimpleHtmlToPdf.Interfaces;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 
@@ -13,12 +12,15 @@ namespace CvjmRechnung.ViewModel
 {
     partial class MainWindowViewModel : ObservableObject
     {
-        [ObservableProperty]
-        Invoice invoiceData = new Invoice();
+        string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CvjmRechnungen\\DateLinks.xml");
+
+        public MainWindowViewModel()
+        {
+            InvoiceData = InvoiceData.LoadFromXml(fileName);
+        }
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(TotalAmount))]
-        ObservableCollection<InvoiceRow> invoiceRows = new();
+        Invoice invoiceData = new Invoice();
 
         [ObservableProperty]
         WebView2 webView = new WebView2();
@@ -26,7 +28,7 @@ namespace CvjmRechnung.ViewModel
         [ObservableProperty]
         string pdfPath = "";
 
-        public double TotalAmount => InvoiceRows.Sum(x =>
+        public double TotalAmount => InvoiceData.InvoiceRows.Sum(x =>
         {
             return x.TotalPrice;
         });
@@ -34,7 +36,7 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void AddRow()
         {
-            InvoiceRows.Add(new InvoiceRow() { Position = InvoiceRows.Count + 1 });
+            InvoiceData.InvoiceRows.Add(new InvoiceRow() { Position = InvoiceData.InvoiceRows.Count + 1 });
             OnPropertyChanged(nameof(TotalAmount));
         }
 
@@ -53,7 +55,7 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void SaveFile()
         {
-
+            InvoiceData.SaveToXml(fileName);
         }
 
         [RelayCommand]

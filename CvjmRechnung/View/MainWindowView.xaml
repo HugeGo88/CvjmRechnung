@@ -68,7 +68,7 @@
                 Grid.Row="1"
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
-                ItemsSource="{Binding InvoiceRows}">
+                ItemsSource="{Binding InvoiceData.InvoiceRows}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="CellEditEnding">
                         <i:InvokeCommandAction Command="{Binding CaculatePriceCommand}" />

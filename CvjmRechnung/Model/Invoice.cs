@@ -1,8 +1,12 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CvjmRechnung.ViewModel;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Xml.Serialization;
 
 namespace CvjmRechnung.Model
 {
-    internal partial class Invoice : ObservableObject
+    public partial class Invoice : ObservableObject
     {
         [ObservableProperty]
         List<string> rents = new()
@@ -38,5 +42,29 @@ namespace CvjmRechnung.Model
 
         [ObservableProperty]
         string rent = "Vereinsheim";
+
+        [ObservableProperty]
+        ObservableCollection<InvoiceRow> invoiceRows = new();
+
+        public void SaveToXml(string filePath)
+        {
+            string directory = Path.GetDirectoryName(filePath);
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            var serializer = new XmlSerializer(typeof(Invoice));
+            using var stream = new FileStream(filePath, FileMode.Create);
+            serializer.Serialize(stream, this);
+        }
+
+        public Invoice LoadFromXml(string filePath)
+        {
+            if (!Path.Exists(filePath))
+                return new Invoice();
+            var serializer = new XmlSerializer(typeof(Invoice));
+            using var stream = new FileStream(filePath, FileMode.Open);
+            return serializer.Deserialize(stream) as Invoice;
+        }
     }
 }
