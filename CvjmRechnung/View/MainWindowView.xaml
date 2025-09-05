@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
     xmlns:local="clr-namespace:CvjmRechnung"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:CvjmRechnung.ViewModel"
@@ -28,29 +29,31 @@
             </Grid.RowDefinitions>
             <StackPanel Margin="5">
                 <Label Content="Reservierungs- oder Rechnungsnummer" />
-                <TextBox Text="{Binding OrderNumber}" />
+                <TextBox Text="{Binding InvoiceData.OrderNumber}" />
+                <Label Content="Firmenname" />
+                <TextBox Text="{Binding InvoiceData.CompanyName}" />
                 <Label Content="Vor- und Nachname" />
-                <TextBox Text="{Binding FirstAndLastName}" />
+                <TextBox Text="{Binding InvoiceData.FirstAndLastName}" />
                 <Label Content="Straße und Hausnummer" />
-                <TextBox Text="{Binding StreetAndNumber}" />
+                <TextBox Text="{Binding InvoiceData.StreetAndNumber}" />
                 <Label Content="PLZ und Ort" />
-                <TextBox Text="{Binding PostalCodeAndCity}" />
+                <TextBox Text="{Binding InvoiceData.PostalCodeAndCity}" />
                 <Label Content="Email" />
-                <TextBox Text="{Binding EmailAddress}" />
+                <TextBox Text="{Binding InvoiceData.EmailAddress}" />
                 <Label Content="Rechnungsdatum" />
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <DatePicker FirstDayOfWeek="Monday" SelectedDate="{Binding Date}" />
+                    <DatePicker FirstDayOfWeek="Monday" SelectedDate="{Binding InvoiceData.Date}" />
                     <Button
                         Grid.Column="1"
                         Command="{Binding SetCurrentDateCommand}"
                         Content="Heute" />
                 </Grid>
                 <Label Content="Mietgegenstände" />
-                <ComboBox ItemsSource="{Binding Rents}" SelectedItem="{Binding Rent}" />
+                <ComboBox ItemsSource="{Binding InvoiceData.Rents}" SelectedItem="{Binding InvoiceData.Rent}" />
                 <!--<CheckBox Margin="0,7,0,0" IsChecked="{Binding IsMember}">
                     <TextBlock Text="Ist Mitglied" />
                 </CheckBox>-->
@@ -65,7 +68,15 @@
                 Grid.Row="1"
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
-                ItemsSource="{Binding InvoiceRows, UpdateSourceTrigger=PropertyChanged}">
+                ItemsSource="{Binding InvoiceRows}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="CellEditEnding">
+                        <i:InvokeCommandAction Command="{Binding CaculatePriceCommand}" />
+                    </i:EventTrigger>
+                    <i:EventTrigger EventName="CurrentCellChanged">
+                        <i:InvokeCommandAction Command="{Binding CaculatePriceCommand}" />
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
                 <DataGrid.Columns>
                     <DataGridTextColumn
                         Binding="{Binding Path=Position}"
