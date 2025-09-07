@@ -1,10 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using CvjmRechnung.Model;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Win32;
-using SimpleHtmlToPdf.Interfaces;
 using System.Diagnostics;
 using System.IO;
 using System.Xml;
@@ -62,8 +60,8 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void GeneratePdf()
         {
+            CalculatePrice();
             PdfPath = $"{Directory.GetCurrentDirectory()}\\test.pdf";
-            var Converter = App.Current.Services.GetService<IConverter>();
             string content = GetHtmlCodeForInvoice();
             RenderPdf(content);
         }
@@ -160,10 +158,8 @@ namespace CvjmRechnung.ViewModel
                 var th = xmlDoc.CreateElement("th");
                 if (headers[i] == "Position")
                     th.SetAttribute("style", "padding:8px; width:100%; text-align:right;");
-                else if (headers[i] == "Gesamtpreis")
-                    th.SetAttribute("style", "padding:8px; text-align:right;");
                 else
-                    th.SetAttribute("style", "padding:8px;");
+                    th.SetAttribute("style", "padding:8px; text-align:right;");
                 th.InnerText = headers[i];
                 trHead.AppendChild(th);
             }

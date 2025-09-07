@@ -32,7 +32,7 @@ namespace CvjmRechnung
         {
             var services = new ServiceCollection();
 
-            services.AddSimpleHtmlToPdf();
+            //            services.AddSimpleHtmlToPdf();
 
             return services.BuildServiceProvider();
         }

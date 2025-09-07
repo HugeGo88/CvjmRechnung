@@ -82,7 +82,7 @@
                     <DataGridTemplateColumn Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <ComboBox IsEditable="True" Text="{Binding Description}">
+                                <ComboBox IsEditable="True" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
                                     <ComboBoxItem Content="Vereinsheim" />
                                     <ComboBoxItem Content="Gelände" />
                                     <ComboBoxItem Content="Vereinsheim und Gelände" />
