@@ -63,7 +63,6 @@
                 Grid.Row="1"
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
-                
                 ItemsSource="{Binding InvoiceData.InvoiceRows}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="CellEditEnding">
@@ -104,7 +103,7 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <Label Content="Summe" FontStyle="Oblique" />
+                <Label Content="Gesamtbetrag" FontStyle="Oblique" />
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
                     <Label Content="{Binding TotalAmount}" FontWeight="Bold" />
                     <Label Content="€" FontStyle="Oblique" />

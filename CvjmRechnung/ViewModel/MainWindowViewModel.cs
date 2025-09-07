@@ -139,29 +139,32 @@ namespace CvjmRechnung.ViewModel
         {
             var xmlDoc = new XmlDocument();
 
-            // Create <table> element
-            var table = xmlDoc.CreateElement("table");
+            // Create root <div>
+            var rootDiv = xmlDoc.CreateElement("div");
+
+            // Create <h1>
             var h1 = xmlDoc.CreateElement("h1");
             h1.InnerText = $"Rechnung {InvoiceData.OrderNumber}";
-            table.AppendChild(h1);
+            rootDiv.AppendChild(h1);
+
+            // Create <table>
+            var table = xmlDoc.CreateElement("table");
             table.SetAttribute("style", "font-family:'Source Sans Pro',sans-serif; font-size:11pt; width:100%; border-collapse:collapse;");
 
             // Create <thead>
             var thead = xmlDoc.CreateElement("thead");
             var trHead = xmlDoc.CreateElement("tr");
             string[] headers = { "#", "Anzahl", "Einheit", "Position", "Einzelpreis", "Gesamtpreis" };
-            foreach (var header in headers)
+            for (int i = 0; i < headers.Length; i++)
             {
                 var th = xmlDoc.CreateElement("th");
-                if (header == "Position")
-                {
+                if (headers[i] == "Position")
                     th.SetAttribute("style", "padding:8px; width:100%; text-align:right;");
-                }
-                else
-                {
+                else if (headers[i] == "Gesamtpreis")
                     th.SetAttribute("style", "padding:8px; text-align:right;");
-                }
-                th.InnerText = header;
+                else
+                    th.SetAttribute("style", "padding:8px;");
+                th.InnerText = headers[i];
                 trHead.AppendChild(th);
             }
             thead.AppendChild(trHead);
@@ -169,28 +172,32 @@ namespace CvjmRechnung.ViewModel
 
             foreach (var row in rows)
             {
-                // Create <tbody>
                 var tbody = xmlDoc.CreateElement("tbody");
                 var trBody = xmlDoc.CreateElement("tr");
                 string[] rowValues = { row.Position.ToString(), row.Quantity.ToString(), row.Unit, row.Description, $"{row.UnitPrice} EUR", $"{row.TotalPrice} EUR" };
-                foreach (var value in rowValues)
+                for (int i = 0; i < rowValues.Length; i++)
                 {
                     var td = xmlDoc.CreateElement("td");
-                    td.SetAttribute("style", "padding:8px; text-align:right;");
-                    td.InnerText = value;
+                    if (i == 3) // Position column
+                        td.SetAttribute("style", "padding:8px; width:100%;");
+                    else if (i == 5) // Gesamtpreis column
+                        td.SetAttribute("style", "padding:8px; text-align:right;");
+                    else
+                        td.SetAttribute("style", "padding:8px;");
+                    td.InnerText = rowValues[i];
                     trBody.AppendChild(td);
                 }
                 tbody.AppendChild(trBody);
                 table.AppendChild(tbody);
-
             }
+
             // Create <tfoot>
             var tfoot = xmlDoc.CreateElement("tfoot");
             var trFoot = xmlDoc.CreateElement("tr");
             var tdSumLabel = xmlDoc.CreateElement("td");
             tdSumLabel.SetAttribute("colspan", "5");
-            tdSumLabel.SetAttribute("style", "padding:8px; text-align:right; font-weight:bold; text-align:right;");
-            tdSumLabel.InnerText = "Summe";
+            tdSumLabel.SetAttribute("style", "padding:8px; text-align:right; font-weight:bold;");
+            tdSumLabel.InnerText = "Gesamtbetrag";
             trFoot.AppendChild(tdSumLabel);
 
             var tdSumValue = xmlDoc.CreateElement("td");
@@ -201,8 +208,16 @@ namespace CvjmRechnung.ViewModel
             tfoot.AppendChild(trFoot);
             table.AppendChild(tfoot);
 
-            // Add table to document
-            xmlDoc.AppendChild(table);
+            // Add table to root
+            rootDiv.AppendChild(table);
+
+            // Add payment info <p>
+            var paymentInfo = xmlDoc.CreateElement("p");
+            paymentInfo.InnerText = "Der Gesamtbetrag ist ab Erhalt der Rechnung zahlbar innerhalb von 7 Tagen ohne Abzug.";
+            rootDiv.AppendChild(paymentInfo);
+
+            // Add root to document
+            xmlDoc.AppendChild(rootDiv);
 
             // Return HTML string
             return xmlDoc.OuterXml;
