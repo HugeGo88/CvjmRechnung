@@ -78,7 +78,7 @@
                         Header="#"
                         IsReadOnly="True" />
                     <DataGridTextColumn Binding="{Binding Path=Quantity}" Header="Anzahl" />
-                    <DataGridTextColumn Binding="{Binding Path=Unit}" Header="Einheit" />
+                    <DataGridTextColumn Binding="{Binding Path=Unit, UpdateSourceTrigger=PropertyChanged}" Header="Einheit" />
                     <DataGridTemplateColumn Width="*">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
@@ -90,7 +90,7 @@
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
-                    <DataGridTextColumn Binding="{Binding Path=UnitPrice}" Header="Einzelpreis" />
+                    <DataGridTextColumn Binding="{Binding Path=UnitPrice, UpdateSourceTrigger=PropertyChanged}" Header="Einzelpreis" />
                     <DataGridTextColumn
                         Binding="{Binding Path=TotalPrice}"
                         Header="Gesamtpreis"
