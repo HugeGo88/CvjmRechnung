@@ -153,7 +153,14 @@ namespace CvjmRechnung.ViewModel
             foreach (var header in headers)
             {
                 var th = xmlDoc.CreateElement("th");
-                th.SetAttribute("style", "padding:8px; text-align:right;");
+                if (header == "Position")
+                {
+                    th.SetAttribute("style", "padding:8px; width:100%; text-align:right;");
+                }
+                else
+                {
+                    th.SetAttribute("style", "padding:8px; text-align:right;");
+                }
                 th.InnerText = header;
                 trHead.AppendChild(th);
             }
