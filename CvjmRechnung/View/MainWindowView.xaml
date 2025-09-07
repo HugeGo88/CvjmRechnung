@@ -63,13 +63,14 @@
                 Grid.Row="1"
                 AutoGenerateColumns="False"
                 CanUserAddRows="False"
+                
                 ItemsSource="{Binding InvoiceData.InvoiceRows}">
                 <i:Interaction.Triggers>
                     <i:EventTrigger EventName="CellEditEnding">
-                        <i:InvokeCommandAction Command="{Binding CaculatePriceCommand}" />
+                        <i:InvokeCommandAction Command="{Binding CalculatePriceCommand}" />
                     </i:EventTrigger>
                     <i:EventTrigger EventName="SelectionChanged">
-                        <i:InvokeCommandAction Command="{Binding CaculatePriceCommand}" />
+                        <i:InvokeCommandAction Command="{Binding CalculatePriceCommand}" />
                     </i:EventTrigger>
                 </i:Interaction.Triggers>
                 <DataGrid.Columns>

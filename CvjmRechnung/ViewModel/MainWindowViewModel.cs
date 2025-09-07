@@ -42,7 +42,7 @@ namespace CvjmRechnung.ViewModel
         }
 
         [RelayCommand]
-        void CaculatePrice()
+        void CalculatePrice()
         {
             OnPropertyChanged(nameof(TotalAmount));
         }

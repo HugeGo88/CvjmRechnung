@@ -9,14 +9,6 @@ namespace CvjmRechnung.Model
     public partial class Invoice : ObservableObject
     {
         [ObservableProperty]
-        List<string> rents = new()
-        {
-            "Vereinsheim",
-            "Gelände",
-            "Vereinsheim und Gelände"
-        };
-
-        [ObservableProperty]
         string orderNumber = "000";
 
         [ObservableProperty]
@@ -38,13 +30,25 @@ namespace CvjmRechnung.Model
         DateTime? date = DateTime.Now;
 
         [ObservableProperty]
-        bool isMember;
-
-        [ObservableProperty]
-        string rent = "Vereinsheim";
-
-        [ObservableProperty]
         ObservableCollection<InvoiceRow> invoiceRows = new();
+
+        public Invoice()
+        {
+            InvoiceRows.CollectionChanged += InvoiceRows_CollectionChanged;
+        }
+
+        private void InvoiceRows_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            OnInvoiceRowsChanged();
+        }
+
+        private void OnInvoiceRowsChanged()
+        {
+            for (int i = 0; i < InvoiceRows.Count; i++)
+            {
+                InvoiceRows[i].Position = i + 1;
+            }
+        }
 
         public void SaveToXml(string filePath)
         {
