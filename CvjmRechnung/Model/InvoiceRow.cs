@@ -10,7 +10,7 @@ namespace CvjmRechnung.ViewModel
         [NotifyPropertyChangedFor(nameof(TotalPrice))]
         public int quantity = 1;
         [ObservableProperty]
-        public string description = "Vereinsheim Miete pro Tag";
+        public string description = "";
         [ObservableProperty]
         [NotifyPropertyChangedFor(nameof(TotalPrice))]
         public double unitPrice = 200;

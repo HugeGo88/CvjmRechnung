@@ -52,11 +52,6 @@
                         Command="{Binding SetCurrentDateCommand}"
                         Content="Heute" />
                 </Grid>
-                <Label Content="Mietgegenstände" />
-                <ComboBox ItemsSource="{Binding InvoiceData.Rents}" SelectedItem="{Binding InvoiceData.Rent}" />
-                <!--<CheckBox Margin="0,7,0,0" IsChecked="{Binding IsMember}">
-                    <TextBlock Text="Ist Mitglied" />
-                </CheckBox>-->
                 <Button
                     Grid.Row="4"
                     Margin="0,10"
@@ -84,10 +79,17 @@
                         IsReadOnly="True" />
                     <DataGridTextColumn Binding="{Binding Path=Quantity}" Header="Anzahl" />
                     <DataGridTextColumn Binding="{Binding Path=Unit}" Header="Einheit" />
-                    <DataGridTextColumn
-                        Width="*"
-                        Binding="{Binding Path=Description}"
-                        Header="Beschreibung" />
+                    <DataGridTemplateColumn Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <ComboBox IsEditable="True" Text="{Binding Description}">
+                                    <ComboBoxItem Content="Vereinsheim" />
+                                    <ComboBoxItem Content="Gelände" />
+                                    <ComboBoxItem Content="Vereinsheim und Gelände" />
+                                </ComboBox>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Binding="{Binding Path=UnitPrice}" Header="Einzelpreis" />
                     <DataGridTextColumn
                         Binding="{Binding Path=TotalPrice}"
