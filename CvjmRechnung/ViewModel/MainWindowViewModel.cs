@@ -3,9 +3,11 @@ using CommunityToolkit.Mvvm.Input;
 using CvjmRechnung.Model;
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Win32;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace CvjmRechnung.ViewModel
 {
@@ -15,11 +17,30 @@ namespace CvjmRechnung.ViewModel
 
         public MainWindowViewModel()
         {
-            //InvoiceData = InvoiceData.LoadFromXml(fileName);
+            if (!Directory.Exists(InvoiceFolder))
+            {
+                Directory.CreateDirectory(InvoiceFolder);
+            }
+
+            var invoiceFiles = Directory.GetFiles(InvoiceFolder, "*.xml");
+            var serializer = new XmlSerializer(typeof(Invoice));
+            Invoices.Clear();
+
+            foreach (var file in invoiceFiles)
+            {
+                using var stream = new FileStream(file, FileMode.Open);
+                if (serializer.Deserialize(stream) is Invoice invoice)
+                {
+                    Invoices.Add(invoice);
+                }
+            }
         }
 
         public string InvoiceFolder { get => Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CvjmRechnungen\\Rechnungen")); }
         public string InvoiceFile { get => Path.Combine(InvoiceFolder, $"Rechnung_{SelectedItem.OrderNumber}"); }
+
+        [ObservableProperty]
+        ObservableCollection<Invoice> invoices = new();
 
         [ObservableProperty]
         Invoice selectedItem = new Invoice();
