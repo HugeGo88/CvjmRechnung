@@ -19,6 +19,9 @@
     <None Update="Resources\addressField.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Resources\empty.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\footer.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

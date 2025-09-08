@@ -15,8 +15,11 @@ namespace CvjmRechnung.ViewModel
 
         public MainWindowViewModel()
         {
-            InvoiceData = InvoiceData.LoadFromXml(fileName);
+            //InvoiceData = InvoiceData.LoadFromXml(fileName);
         }
+
+        public string InvoiceFolder { get => Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CvjmRechnungen\\Rechnungen")); }
+        public string InvoiceFile { get => Path.Combine(InvoiceFolder, $"Rechnung_{InvoiceData.OrderNumber}"); }
 
         [ObservableProperty]
         Invoice invoiceData = new Invoice();
@@ -54,27 +57,36 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void SaveFile()
         {
-            InvoiceData.SaveToXml(fileName);
+            if (!Path.Exists(InvoiceFolder))
+            {
+                Directory.CreateDirectory(InvoiceFolder);
+            }
+            InvoiceData.SaveToXml($"{InvoiceFile}.xml");
         }
 
         [RelayCommand]
         void GeneratePdf()
         {
             CalculatePrice();
-            PdfPath = $"{Directory.GetCurrentDirectory()}\\test.pdf";
+            PdfPath = $"{Directory.GetCurrentDirectory()}\\empty.pdf";
             string content = GetHtmlCodeForInvoice();
             RenderPdf(content);
         }
 
         private void RenderPdf(string content)
         {
-            File.WriteAllText($"{Directory.GetCurrentDirectory()}\\temp.html", content);
+            string templatePathHtml = Directory.GetCurrentDirectory() + "\\template.html";
+            if (!Path.Exists(InvoiceFolder))
+            {
+                Directory.CreateDirectory(InvoiceFolder);
+            }
+            File.WriteAllText($"{templatePathHtml}", content);
 
             string pathToExe = getPathForExe("msedge.exe");
             ProcessStartInfo ps = new ProcessStartInfo()
             {
                 FileName = pathToExe,
-                Arguments = $"--headless --disable-gpu --print-to-pdf-no-header --run-all-compositor-stages-before-draw --virtual-time-budget=5000 --print-to-pdf=\"{Directory.GetCurrentDirectory()}\\Rechnung_{InvoiceData.OrderNumber}.pdf\" \"{Directory.GetCurrentDirectory()}\\temp.html\"",
+                Arguments = $"--headless --disable-gpu --print-to-pdf-no-header --run-all-compositor-stages-before-draw --virtual-time-budget=5000 --print-to-pdf=\"{InvoiceFile}.pdf\" \"{templatePathHtml}\"",
                 CreateNoWindow = true,
                 UseShellExecute = false
             };
@@ -89,7 +101,7 @@ namespace CvjmRechnung.ViewModel
             }
             else
             {
-                PdfPath = $"{Directory.GetCurrentDirectory()}\\Rechnung_{InvoiceData.OrderNumber}.pdf";
+                PdfPath = $"{InvoiceFile}.pdf";
             }
         }
 
