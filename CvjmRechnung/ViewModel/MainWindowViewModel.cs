@@ -19,10 +19,10 @@ namespace CvjmRechnung.ViewModel
         }
 
         public string InvoiceFolder { get => Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CvjmRechnungen\\Rechnungen")); }
-        public string InvoiceFile { get => Path.Combine(InvoiceFolder, $"Rechnung_{InvoiceData.OrderNumber}"); }
+        public string InvoiceFile { get => Path.Combine(InvoiceFolder, $"Rechnung_{SelectedItem.OrderNumber}"); }
 
         [ObservableProperty]
-        Invoice invoiceData = new Invoice();
+        Invoice selectedItem = new Invoice();
 
         [ObservableProperty]
         WebView2 webView = new WebView2();
@@ -30,7 +30,7 @@ namespace CvjmRechnung.ViewModel
         [ObservableProperty]
         string pdfPath = "";
 
-        public double TotalAmount => InvoiceData.InvoiceRows.Sum(x =>
+        public double TotalAmount => SelectedItem.InvoiceRows.Sum(x =>
         {
             return x.TotalPrice;
         });
@@ -38,7 +38,7 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void AddRow()
         {
-            InvoiceData.InvoiceRows.Add(new InvoiceRow() { Position = InvoiceData.InvoiceRows.Count + 1 });
+            SelectedItem.InvoiceRows.Add(new InvoiceRow() { Position = SelectedItem.InvoiceRows.Count + 1 });
             OnPropertyChanged(nameof(TotalAmount));
         }
 
@@ -51,7 +51,7 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void SetCurrentDate()
         {
-            InvoiceData.Date = DateTime.Now;
+            SelectedItem.Date = DateTime.Now;
         }
 
         [RelayCommand]
@@ -61,7 +61,7 @@ namespace CvjmRechnung.ViewModel
             {
                 Directory.CreateDirectory(InvoiceFolder);
             }
-            InvoiceData.SaveToXml($"{InvoiceFile}.xml");
+            SelectedItem.SaveToXml($"{InvoiceFile}.xml");
         }
 
         [RelayCommand]
@@ -123,8 +123,8 @@ namespace CvjmRechnung.ViewModel
         {
             string content = File.ReadAllText("resources/index.html");
             content = content.Replace("{ADDRESS_FIELD}", File.ReadAllText("resources/addressField.html"));
-            content = content.Replace("{CONTENT}", CreateInvoiceTableHtml(InvoiceData.InvoiceRows.ToList()));
-            content = content.Replace("{ADDRESS_COMPANY}", InvoiceData.CompanyName);
+            content = content.Replace("{CONTENT}", CreateInvoiceTableHtml(SelectedItem.InvoiceRows.ToList()));
+            content = content.Replace("{ADDRESS_COMPANY}", SelectedItem.CompanyName);
             content = content.Replace("{CLUB_NAME}", "CVJM Walheim");
             content = content.Replace("{CLUB_STREET}", "Auf der Burg 6");
             content = content.Replace("{CLUB_CITY}", "Walheim");
@@ -136,11 +136,11 @@ namespace CvjmRechnung.ViewModel
             content = content.Replace("{CLUB_BANK}", "VR-Bank Ludwigsburg eG");
             content = content.Replace("{CLUB_BOARD1}", "Hugo Tausch");
             content = content.Replace("{CLUB_BOARD2}", "Stephanie Alber");
-            content = content.Replace("{ORDER_NUMBER}", InvoiceData.OrderNumber);
-            content = content.Replace("{ADDRESS_NAME}", InvoiceData.FirstAndLastName);
-            content = content.Replace("{ADDRESS_STREET}", InvoiceData.StreetAndNumber);
-            content = content.Replace("{ADDRESS_CITY}", InvoiceData.PostalCodeAndCity);
-            content = content.Replace("{DATE}", InvoiceData.Date.HasValue ? InvoiceData.Date.Value.ToString("dd MMMM yyyy") : "");
+            content = content.Replace("{ORDER_NUMBER}", SelectedItem.OrderNumber);
+            content = content.Replace("{ADDRESS_NAME}", SelectedItem.FirstAndLastName);
+            content = content.Replace("{ADDRESS_STREET}", SelectedItem.StreetAndNumber);
+            content = content.Replace("{ADDRESS_CITY}", SelectedItem.PostalCodeAndCity);
+            content = content.Replace("{DATE}", SelectedItem.Date.HasValue ? SelectedItem.Date.Value.ToString("dd MMMM yyyy") : "");
             File.WriteAllText("test.html", content);
             return content;
         }
@@ -154,7 +154,7 @@ namespace CvjmRechnung.ViewModel
 
             // Create <h1>
             var h1 = xmlDoc.CreateElement("h1");
-            h1.InnerText = $"Rechnung {InvoiceData.OrderNumber}";
+            h1.InnerText = $"Rechnung {SelectedItem.OrderNumber}";
             rootDiv.AppendChild(h1);
 
             // Create <table>
