@@ -174,12 +174,10 @@ namespace CvjmRechnung.ViewModel
                 for (int i = 0; i < rowValues.Length; i++)
                 {
                     var td = xmlDoc.CreateElement("td");
-                    if (i == 3) // Position column
-                        td.SetAttribute("style", "padding:8px; width:100%;");
-                    else if (i == 5) // Gesamtpreis column
-                        td.SetAttribute("style", "padding:8px; text-align:right;");
+                    if (headers[i] == "Position") // Position column
+                        td.SetAttribute("style", "padding:8px; width:100%; text-align:right;");
                     else
-                        td.SetAttribute("style", "padding:8px;");
+                        td.SetAttribute("style", "padding:8px; text-align:right;");
                     td.InnerText = rowValues[i];
                     trBody.AppendChild(td);
                 }
