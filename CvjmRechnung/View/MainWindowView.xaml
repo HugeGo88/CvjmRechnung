@@ -35,7 +35,26 @@
                     Grid.Row="0"
                     Grid.Column="0"
                     Content="Neue Rechnung" />
-                <ListView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Invoices}" SelectedItem="{Binding SelectedItem}"/>
+                <ListView
+                    Grid.Row="1"
+                    Grid.Column="0"
+                    ItemsSource="{Binding Invoices}"
+                    SelectedItem="{Binding SelectedItem}">
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <WrapPanel>
+                                    <TextBlock Text="Rechnung: " />
+                                    <TextBlock FontWeight="Bold" Text="{Binding OrderNumber}" />
+                                </WrapPanel>
+                                <WrapPanel>
+                                    <TextBlock Text="Name: " />
+                                    <TextBlock FontWeight="Bold" Text="{Binding FirstAndLastName}" />
+                                </WrapPanel>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
             </Grid>
             <Grid Grid.Column="1">
                 <Grid.RowDefinitions>

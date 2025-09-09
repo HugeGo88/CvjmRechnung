@@ -17,6 +17,11 @@ namespace CvjmRechnung.ViewModel
 
         public MainWindowViewModel()
         {
+            LoadInvoiceFolder();
+        }
+
+        private void LoadInvoiceFolder()
+        {
             if (!Directory.Exists(InvoiceFolder))
             {
                 Directory.CreateDirectory(InvoiceFolder);
@@ -44,6 +49,23 @@ namespace CvjmRechnung.ViewModel
 
         [ObservableProperty]
         Invoice selectedItem = new Invoice();
+
+        partial void OnSelectedItemChanged(Invoice value)
+        {
+            if (value.InvoicePath is null)
+            {
+                PdfPath = "";
+                return;
+            }
+
+            if (!Path.Exists($"{value.InvoicePath}.pdf"))
+            {
+                PdfPath = "";
+                return;
+            }
+
+            PdfPath = $"{value.InvoicePath}.pdf";
+        }
 
         [ObservableProperty]
         WebView2 webView = new WebView2();
@@ -82,6 +104,7 @@ namespace CvjmRechnung.ViewModel
             {
                 Directory.CreateDirectory(InvoiceFolder);
             }
+            SelectedItem.InvoicePath = InvoiceFile;
             SelectedItem.SaveToXml($"{InvoiceFile}.xml");
         }
 
@@ -92,6 +115,7 @@ namespace CvjmRechnung.ViewModel
             PdfPath = $"{Directory.GetCurrentDirectory()}\\empty.pdf";
             string content = GetHtmlCodeForInvoice();
             RenderPdf(content);
+            SaveFile();
         }
 
         private void RenderPdf(string content)

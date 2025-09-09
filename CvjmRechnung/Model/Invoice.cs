@@ -8,6 +8,8 @@ namespace CvjmRechnung.Model
 {
     public partial class Invoice : ObservableObject
     {
+        public string InvoicePath { get; set; }
+
         [ObservableProperty]
         string orderNumber = "000";
 
