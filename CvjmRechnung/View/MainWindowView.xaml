@@ -34,6 +34,7 @@
                 <Button
                     Grid.Row="0"
                     Grid.Column="0"
+                    Command="{Binding AddNewInvoiceCommand}"
                     Content="Neue Rechnung" />
                 <ListView
                     Grid.Row="1"
@@ -164,7 +165,10 @@
             </Grid.RowDefinitions>
             <Button Command="{Binding GeneratePdfCommand}" Content="PDF erzeugen" />
             <wpf:WebView2 Grid.Row="1" Source="{Binding PdfPath}" />
-            <Button Grid.Row="2" Content="Rechnung via Email senden" />
+            <Button
+                Grid.Row="2"
+                Content="Rechnung via Email senden"
+                IsEnabled="False" />
         </Grid>
     </Grid>
 </Window>

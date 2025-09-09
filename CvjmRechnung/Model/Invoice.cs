@@ -11,7 +11,7 @@ namespace CvjmRechnung.Model
         public string InvoicePath { get; set; }
 
         [ObservableProperty]
-        string orderNumber = "000";
+        string orderNumber = "NeueRechnung";
 
         [ObservableProperty]
         string companyName = "Max Mustermann GmbH";
