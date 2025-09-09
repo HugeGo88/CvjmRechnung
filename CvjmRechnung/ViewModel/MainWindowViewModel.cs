@@ -3,8 +3,10 @@ using CommunityToolkit.Mvvm.Input;
 using CvjmRechnung.Model;
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Win32;
+using QRCoder;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
@@ -278,8 +280,31 @@ namespace CvjmRechnung.ViewModel
             // Add root to document
             xmlDoc.AppendChild(rootDiv);
 
+            // Add QR code image
+            string qrCodeContent = $"BCD\r\n001\r\n1\r\nSCT\r\nGENODES1VBB\r\nCVJM Walheim e.V.\r\nDE10604914300390539007\r\nEUR{TotalAmount}\r\nBILL\r\n\r\nRechnung Nr {SelectedItem.OrderNumber} {SelectedItem.FirstAndLastName}\r\nRechnung Nr {SelectedItem.OrderNumber}";
+
+            string qrHtml = CreateQrCodeImgTag(qrCodeContent); // Or any string you want
+            var qrDoc = new XmlDocument();
+            qrDoc.LoadXml(qrHtml);
+            var qrImgNode = xmlDoc.ImportNode(qrDoc.DocumentElement, true);
+            rootDiv.AppendChild(qrImgNode);
+
             // Return HTML string
             return xmlDoc.OuterXml;
+        }
+
+        public string CreateQrCodeImgTag(string input)
+        {
+            using var qrGenerator = new QRCodeGenerator();
+            using var qrCodeData = qrGenerator.CreateQrCode(input, QRCodeGenerator.ECCLevel.Q);
+            using var qrCode = new QRCode(qrCodeData);
+            using var bitmap = qrCode.GetGraphic(20);
+
+            using var ms = new MemoryStream();
+            bitmap.Save(ms, ImageFormat.Png);
+            string base64 = Convert.ToBase64String(ms.ToArray());
+
+            return $"<img src=\"data:image/png;base64,{base64}\" alt=\"QR Code\" width=\"150\" height=\"150\" />";
         }
     }
 }
