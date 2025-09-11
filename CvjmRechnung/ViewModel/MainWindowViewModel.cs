@@ -90,7 +90,7 @@ namespace CvjmRechnung.ViewModel
 
         private void RenderPdf(string content)
         {
-            string templatePathHtml = Path.GetTempPath() + "\\template.html";
+            string templatePathHtml = Directory.GetCurrentDirectory() + "\\template.html";
             if (!Path.Exists(InvoiceFolder))
             {
                 Directory.CreateDirectory(InvoiceFolder);
