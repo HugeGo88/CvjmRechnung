@@ -7,6 +7,7 @@ using QRCoder;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
@@ -195,7 +196,7 @@ namespace CvjmRechnung.ViewModel
             content = content.Replace("{ADDRESS_NAME}", SelectedItem.FirstAndLastName);
             content = content.Replace("{ADDRESS_STREET}", SelectedItem.StreetAndNumber);
             content = content.Replace("{ADDRESS_CITY}", SelectedItem.PostalCodeAndCity);
-            content = content.Replace("{DATE}", SelectedItem.Date.HasValue ? SelectedItem.Date.Value.ToString("dd MMMM yyyy") : "");
+            content = content.Replace("{DATE}", SelectedItem.Date.HasValue ? SelectedItem.Date.Value.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("de-DE")) : "");
             File.WriteAllText("test.html", content);
             return content;
         }
@@ -304,7 +305,7 @@ namespace CvjmRechnung.ViewModel
             bitmap.Save(ms, ImageFormat.Png);
             string base64 = Convert.ToBase64String(ms.ToArray());
 
-            return $"<img src=\"data:image/png;base64,{base64}\" alt=\"QR Code\" width=\"150\" height=\"150\" />";
+            return $"<img src=\"data:image/png;base64,{base64}\" alt=\"QR Code\" width=\"100\" height=\"100\" />";
         }
     }
 }
