@@ -16,13 +16,45 @@ namespace CvjmRechnung.ViewModel
 {
     partial class MainWindowViewModel : ObservableObject
     {
-        string fileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CvjmRechnungen\\DateLinks.xml");
+        #region fields
 
+        private string _emptyPdf = $"{Directory.GetCurrentDirectory()}\\empty.pdf";
+
+        #endregion
+
+        #region Properties
+
+        public string InvoiceFolder { get => Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CvjmRechnungen\\Rechnungen")); }
+        public string InvoiceFile { get => Path.Combine(InvoiceFolder, $"Rechnung_{SelectedItem.OrderNumber}"); }
+
+        [ObservableProperty]
+        ObservableCollection<Invoice> invoices = new();
+
+        [ObservableProperty]
+        Invoice selectedItem = new Invoice();
+
+        [ObservableProperty]
+        WebView2 webView = new WebView2();
+
+        [ObservableProperty]
+        string pdfPath = "";
+
+        public double TotalAmount => SelectedItem.InvoiceRows.Sum(x =>
+        {
+            return x.TotalPrice;
+        });
+
+        #endregion
+
+        #region constructor
         public MainWindowViewModel()
         {
             LoadInvoiceFolder();
         }
 
+        #endregion
+
+        #region methods
         private void LoadInvoiceFolder()
         {
             if (!Directory.Exists(InvoiceFolder))
@@ -44,15 +76,6 @@ namespace CvjmRechnung.ViewModel
             }
         }
 
-        public string InvoiceFolder { get => Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CvjmRechnungen\\Rechnungen")); }
-        public string InvoiceFile { get => Path.Combine(InvoiceFolder, $"Rechnung_{SelectedItem.OrderNumber}"); }
-
-        [ObservableProperty]
-        ObservableCollection<Invoice> invoices = new();
-
-        [ObservableProperty]
-        Invoice selectedItem = new Invoice();
-
         partial void OnSelectedItemChanged(Invoice value)
         {
             PdfPath = _emptyPdf;
@@ -63,59 +86,6 @@ namespace CvjmRechnung.ViewModel
             if (!Path.Exists($"{value.InvoicePath}.pdf")) { return; }
 
             PdfPath = $"{value.InvoicePath}.pdf";
-        }
-
-        [ObservableProperty]
-        WebView2 webView = new WebView2();
-
-        [ObservableProperty]
-        string pdfPath = "";
-
-        private string _emptyPdf = $"{Directory.GetCurrentDirectory()}\\empty.pdf";
-
-        public double TotalAmount => SelectedItem.InvoiceRows.Sum(x =>
-        {
-            return x.TotalPrice;
-        });
-
-        [RelayCommand]
-        void AddRow()
-        {
-            SelectedItem.InvoiceRows.Add(new InvoiceRow() { Position = SelectedItem.InvoiceRows.Count + 1 });
-            OnPropertyChanged(nameof(TotalAmount));
-        }
-
-        [RelayCommand]
-        void CalculatePrice()
-        {
-            OnPropertyChanged(nameof(TotalAmount));
-        }
-
-        [RelayCommand]
-        void SetCurrentDate()
-        {
-            SelectedItem.Date = DateTime.Now;
-        }
-
-        [RelayCommand]
-        void SaveFile()
-        {
-            if (!Path.Exists(InvoiceFolder))
-            {
-                Directory.CreateDirectory(InvoiceFolder);
-            }
-            SelectedItem.InvoicePath = InvoiceFile;
-            SelectedItem.SaveToXml($"{InvoiceFile}.xml");
-        }
-
-        [RelayCommand]
-        void GeneratePdf()
-        {
-            CalculatePrice();
-            PdfPath = _emptyPdf;
-            string content = GetHtmlCodeForInvoice();
-            RenderPdf(content);
-            SaveFile();
         }
 
         private void RenderPdf(string content)
@@ -162,17 +132,6 @@ namespace CvjmRechnung.ViewModel
                 fileKey.Close();
             }
             return (string)result;
-        }
-
-        [RelayCommand]
-        void AddNewInvoice()
-        {
-            if (Invoices is null) { return; }
-            Invoices.Add(new Invoice());
-            OnPropertyChanged(nameof(Invoices));
-            //SaveFile();
-            //LoadInvoiceFolder();
-            SelectedItem = Invoices.Last();
         }
 
         private string GetHtmlCodeForInvoice()
@@ -307,5 +266,63 @@ namespace CvjmRechnung.ViewModel
 
             return $"<img src=\"data:image/png;base64,{base64}\" alt=\"QR Code\" width=\"100\" height=\"100\" />";
         }
+
+        #endregion
+
+        #region commands
+
+        [RelayCommand]
+        void AddRow()
+        {
+            SelectedItem.InvoiceRows.Add(new InvoiceRow() { Position = SelectedItem.InvoiceRows.Count + 1 });
+            OnPropertyChanged(nameof(TotalAmount));
+        }
+
+        [RelayCommand]
+        void CalculatePrice()
+        {
+            OnPropertyChanged(nameof(TotalAmount));
+        }
+
+        [RelayCommand]
+        void SetCurrentDate()
+        {
+            SelectedItem.Date = DateTime.Now;
+        }
+
+        [RelayCommand]
+        void SaveFile()
+        {
+            if (!Path.Exists(InvoiceFolder))
+            {
+                Directory.CreateDirectory(InvoiceFolder);
+            }
+            SelectedItem.InvoicePath = InvoiceFile;
+            SelectedItem.SaveToXml($"{InvoiceFile}.xml");
+        }
+
+        [RelayCommand]
+        void GeneratePdf()
+        {
+            CalculatePrice();
+            PdfPath = _emptyPdf;
+            string content = GetHtmlCodeForInvoice();
+            RenderPdf(content);
+            SaveFile();
+        }
+
+        [RelayCommand]
+        void AddNewInvoice()
+        {
+            if (Invoices is null) { return; }
+            Invoices.Add(new Invoice());
+            OnPropertyChanged(nameof(Invoices));
+            //SaveFile();
+            //LoadInvoiceFolder();
+            SelectedItem = Invoices.Last();
+        }
+
+        #endregion
+
     }
 }
