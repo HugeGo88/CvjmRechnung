@@ -18,7 +18,7 @@ namespace CvjmRechnung.ViewModel
     {
         #region fields
 
-        private string _emptyPdf = $"{Directory.GetCurrentDirectory()}\\empty.pdf";
+        private string _emptyPdf = $"{Directory.GetCurrentDirectory()}\\Resources\\empty.pdf";
 
         #endregion
 
@@ -90,7 +90,7 @@ namespace CvjmRechnung.ViewModel
 
         private void RenderPdf(string content)
         {
-            string templatePathHtml = Directory.GetCurrentDirectory() + "\\template.html";
+            string templatePathHtml = Path.Combine(Path.GetTempPath(), "template.html");
             if (!Path.Exists(InvoiceFolder))
             {
                 Directory.CreateDirectory(InvoiceFolder);
