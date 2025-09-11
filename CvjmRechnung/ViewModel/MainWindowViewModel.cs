@@ -24,7 +24,7 @@ namespace CvjmRechnung.ViewModel
 
         #region Properties
 
-        public string InvoiceFolder { get => Path.Combine(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CvjmRechnungen\\Rechnungen")); }
+        public string InvoiceFolder { get => Path.Combine(Path.Combine(Directory.GetParent(Environment.CurrentDirectory).ToString(), "Rechnungen")); }
         public string InvoiceFile { get => Path.Combine(InvoiceFolder, $"Rechnung_{SelectedItem.OrderNumber}"); }
 
         [ObservableProperty]
@@ -90,7 +90,7 @@ namespace CvjmRechnung.ViewModel
 
         private void RenderPdf(string content)
         {
-            string templatePathHtml = Directory.GetCurrentDirectory() + "\\template.html";
+            string templatePathHtml = Path.GetTempPath() + "\\template.html";
             if (!Path.Exists(InvoiceFolder))
             {
                 Directory.CreateDirectory(InvoiceFolder);
