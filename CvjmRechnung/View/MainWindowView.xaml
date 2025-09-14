@@ -160,6 +160,7 @@
                     <Button
                         Grid.Row="2"
                         Grid.ColumnSpan="2"
+                        Command="{Binding SendEmailCommand}"
                         Content="Rechnung via Email senden"
                         IsEnabled="False" />
                 </Grid>

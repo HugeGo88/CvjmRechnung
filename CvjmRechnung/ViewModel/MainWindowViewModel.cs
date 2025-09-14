@@ -322,6 +322,12 @@ namespace CvjmRechnung.ViewModel
             SelectedItem = Invoices.Last();
         }
 
+        [RelayCommand]
+        void SendMail()
+        {
+
+        }
+
         #endregion
 
     }
