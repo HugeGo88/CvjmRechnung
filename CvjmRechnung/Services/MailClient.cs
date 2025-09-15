@@ -5,6 +5,8 @@ namespace CvjmRechnung.Services
 {
     public class MailClient : IMailClient
     {
+        private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
         public void Send(string to, string subject, string body, List<string> attachments)
         {
             //HACK: need to be deleted
@@ -21,9 +23,12 @@ namespace CvjmRechnung.Services
             try
             {
                 client.Send(message);
+                _logger.Debug($"E-Mail send to {to}");
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, $"Error sending E-Mail to {to}");
+                throw;
             }
         }
     }

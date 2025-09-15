@@ -6,8 +6,11 @@ using System.Xml.Serialization;
 
 namespace CvjmRechnung.Model
 {
+
     public partial class Invoice : ObservableObject
     {
+        private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
         public string InvoicePath { get; set; }
 
         [ObservableProperty]
@@ -62,6 +65,7 @@ namespace CvjmRechnung.Model
             var serializer = new XmlSerializer(typeof(Invoice));
             using var stream = new FileStream(filePath, FileMode.Create);
             serializer.Serialize(stream, this);
+            _logger.Debug($"Invoice saved to {filePath}");
         }
 
         public Invoice LoadFromXml(string filePath)
@@ -70,6 +74,7 @@ namespace CvjmRechnung.Model
                 return new Invoice();
             var serializer = new XmlSerializer(typeof(Invoice));
             using var stream = new FileStream(filePath, FileMode.Open);
+            _logger.Debug($"Invoice loaded from {filePath}");
             return serializer.Deserialize(stream) as Invoice;
         }
     }

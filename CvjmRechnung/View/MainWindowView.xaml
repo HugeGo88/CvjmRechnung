@@ -9,6 +9,8 @@
     xmlns:vm="clr-namespace:CvjmRechnung.ViewModel"
     xmlns:wpf="clr-namespace:Microsoft.Web.WebView2.Wpf;assembly=Microsoft.Web.WebView2.Wpf"
     Title="CVJM Rechnung"
+    d:Height="600"
+    d:Width="800"
     Icon="/Resources/logo.png"
     WindowState="Maximized"
     mc:Ignorable="d">
