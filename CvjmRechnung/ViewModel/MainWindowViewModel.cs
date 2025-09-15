@@ -92,6 +92,7 @@ namespace CvjmRechnung.ViewModel
         private void RenderPdf(string content)
         {
             string templatePathHtml = Path.Combine(Path.GetTempPath(), "template.html");
+            templatePathHtml = Path.Combine(Path.GetTempPath(), "template.html");
             if (!Path.Exists(InvoiceFolder))
             {
                 Directory.CreateDirectory(InvoiceFolder);
@@ -157,7 +158,6 @@ namespace CvjmRechnung.ViewModel
             content = content.Replace("{ADDRESS_STREET}", SelectedItem.StreetAndNumber);
             content = content.Replace("{ADDRESS_CITY}", SelectedItem.PostalCodeAndCity);
             content = content.Replace("{DATE}", SelectedItem.Date.HasValue ? SelectedItem.Date.Value.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("de-DE")) : "");
-            File.WriteAllText("test.html", content);
             return content;
         }
 
