@@ -6,11 +6,16 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Untitled.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="NLog.xsd" />
     <None Remove="Resources\logo.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Untitled.ico" />
   </ItemGroup>
 
   <ItemGroup>
