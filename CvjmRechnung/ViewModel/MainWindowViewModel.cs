@@ -18,6 +18,7 @@ namespace CvjmRechnung.ViewModel
     {
         #region fields
 
+        private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         private string _emptyPdf = $"{Directory.GetCurrentDirectory()}\\Resources\\empty.pdf";
 
         #endregion
@@ -274,6 +275,7 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void AddRow()
         {
+            _logger.Info("Add new row button pressed");
             SelectedItem.InvoiceRows.Add(new InvoiceRow() { Position = SelectedItem.InvoiceRows.Count + 1 });
             OnPropertyChanged(nameof(TotalAmount));
         }
@@ -287,12 +289,14 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void SetCurrentDate()
         {
+            _logger.Info("Set current date button pressed");
             SelectedItem.Date = DateTime.Now;
         }
 
         [RelayCommand]
         void SaveFile()
         {
+            _logger.Info("Save file button pressed");
             if (!Path.Exists(InvoiceFolder))
             {
                 Directory.CreateDirectory(InvoiceFolder);
@@ -304,6 +308,7 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void GeneratePdf()
         {
+            _logger.Info("Generate PDF button pressed");
             CalculatePrice();
             PdfPath = _emptyPdf;
             string content = GetHtmlCodeForInvoice();
@@ -314,6 +319,7 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void AddNewInvoice()
         {
+            _logger.Info("Add new invoice button pressed");
             if (Invoices is null) { return; }
             Invoices.Add(new Invoice());
             OnPropertyChanged(nameof(Invoices));
@@ -325,7 +331,7 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void SendMail()
         {
-
+            _logger.Info("Send mail button pressed");
         }
 
         #endregion

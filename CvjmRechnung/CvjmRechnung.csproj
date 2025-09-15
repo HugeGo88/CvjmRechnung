@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="NLog.xsd" />
     <None Remove="Resources\logo.png" />
   </ItemGroup>
 
@@ -16,17 +17,29 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3485.44" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+    <PackageReference Include="NLog" Version="6.0.4" />
+    <PackageReference Include="NLog.Schema" Version="6.0.4" />
     <PackageReference Include="QRCoder" Version="1.6.0" />
     <PackageReference Include="SimpleHtmlToPdf" Version="3.0.5" />
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="NLog.xsd" />
     <Resource Include="Resources\logo.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="AssemblyInfo.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Resources\addressField.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
