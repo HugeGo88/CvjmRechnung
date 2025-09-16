@@ -124,6 +124,7 @@
                                         <ComboBoxItem Content="Vereinsheim" />
                                         <ComboBoxItem Content="Gelände" />
                                         <ComboBoxItem Content="Vereinsheim und Gelände" />
+                                        <ComboBoxItem Content="Endreinigung" />
                                     </ComboBox>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
