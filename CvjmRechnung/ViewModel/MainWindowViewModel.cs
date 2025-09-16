@@ -235,7 +235,7 @@ namespace CvjmRechnung.ViewModel
 
             // Add payment info <p>
             var paymentInfo = xmlDoc.CreateElement("p");
-            paymentInfo.InnerText = "Der Gesamtbetrag ist ab Erhalt der Rechnung zahlbar innerhalb von 7 Tagen ohne Abzug.";
+            paymentInfo.InnerText = "Der Gesamtbetrag ist ab Erhalt der Rechnung zahlbar innerhalb von 10 Tagen ohne Abzug.";
             rootDiv.AppendChild(paymentInfo);
 
             // Add root to document
