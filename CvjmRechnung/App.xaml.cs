@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CvjmRechnung.Interfaces;
+using CvjmRechnung.Services;
+using CvjmRechnung.ViewModel;
+using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
 
 namespace CvjmRechnung
@@ -8,8 +11,12 @@ namespace CvjmRechnung
     /// </summary>
     public partial class App : Application
     {
+        private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
+
         public App()
         {
+            _logger.Info("***** PROGRAM STARTED *****");
             Services = ConfigureServices();
 
             this.InitializeComponent();
@@ -31,10 +38,26 @@ namespace CvjmRechnung
         private static IServiceProvider ConfigureServices()
         {
             var services = new ServiceCollection();
-
-            //            services.AddSimpleHtmlToPdf();
-
+            // Add Services
+            services.AddSingleton<IMailClient, MailClientService>();
+            services.AddSingleton<IConfiguration, ConfigurationService>();
+            // Add ViewModels
+            services.AddTransient<MainWindowViewModel>();
             return services.BuildServiceProvider();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            try
+            {
+                App.Current.Services.GetService<IConfiguration>()?.Save();
+                _logger.Info("***** PROGRAM ENDED *****");
+
+            }
+            finally
+            {
+                base.OnExit(e);
+            }
         }
     }
 

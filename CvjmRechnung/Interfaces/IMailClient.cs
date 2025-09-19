@@ -2,6 +2,6 @@
 {
     interface IMailClient
     {
-        void Send(string to, string subject, string body, List<string> attachments);
+        void Send(string to, string subject, string body, List<string> attachments, string password);
     }
 }

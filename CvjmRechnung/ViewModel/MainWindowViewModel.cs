@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CvjmRechnung.Interfaces;
 using CvjmRechnung.Model;
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Win32;
@@ -45,12 +46,19 @@ namespace CvjmRechnung.ViewModel
             return x.TotalPrice;
         });
 
+        private readonly IMailClient iMailClientService;
+        private readonly IConfiguration iConfiguration;
+
         #endregion
 
         #region constructor
-        public MainWindowViewModel()
+        //public MainWindowViewModel(IMailClient mailClient)
+        public MainWindowViewModel(IMailClient mailClientService, IConfiguration configuration)
         {
             LoadInvoiceFolder();
+            iMailClientService = mailClientService;
+            iConfiguration = configuration;
+            iConfiguration.Load();
         }
 
         #endregion
@@ -323,8 +331,6 @@ namespace CvjmRechnung.ViewModel
             if (Invoices is null) { return; }
             Invoices.Add(new Invoice());
             OnPropertyChanged(nameof(Invoices));
-            //SaveFile();
-            //LoadInvoiceFolder();
             SelectedItem = Invoices.Last();
         }
 
@@ -332,6 +338,7 @@ namespace CvjmRechnung.ViewModel
         void SendMail()
         {
             _logger.Info("Send mail button pressed");
+            iMailClientService.Send("hugo.tausch@gmail.com", $"Rechnung {SelectedItem.OrderNumber}", "", [], iConfiguration.Password);
         }
 
         #endregion
