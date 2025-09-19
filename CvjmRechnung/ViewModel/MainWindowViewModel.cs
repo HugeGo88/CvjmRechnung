@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
+using System.Windows;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -338,7 +339,28 @@ namespace CvjmRechnung.ViewModel
         void SendMail()
         {
             _logger.Info("Send mail button pressed");
-            iMailClientService.Send("hugo.tausch@gmail.com", $"Rechnung {SelectedItem.OrderNumber}", "", [], iConfiguration.Password);
+
+            // Show confirmation dialog before sending email
+            var result = MessageBox.Show(
+                "Soll die Rechnung nun per Email versendet werden?",
+                "Email senden",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question
+            );
+
+            if (result != MessageBoxResult.Yes)
+            {
+                _logger.Info("Email send canceled by user.");
+                return;
+            }
+
+            iMailClientService.Send(
+                SelectedItem.EmailAddress,
+                $"Rechnung {SelectedItem.OrderNumber}",
+                "Test",
+                [SelectedItem.InvoicePath + ".pdf"],
+                iConfiguration.Password
+            );
         }
 
         #endregion

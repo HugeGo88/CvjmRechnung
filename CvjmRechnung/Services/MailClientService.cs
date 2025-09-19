@@ -9,13 +9,22 @@ namespace CvjmRechnung.Services
 
         public void Send(string to, string subject, string body, List<string> attachments, string password)
         {
-            //HACK: need to be deleted
-            to = "hugo.tausch@gmail.com";
-
             string from = "hausbelegung@cvjm-walheim.de";
             MailMessage message = new MailMessage(from, to);
-            message.Subject = "Using the new SMTP client.";
-            message.Body = @"Using this new feature, you can send an email message from an application very easily.";
+            message.Subject = subject;
+            message.Body = body;
+
+            if (attachments != null)
+            {
+                foreach (var filePath in attachments)
+                {
+                    if (!string.IsNullOrWhiteSpace(filePath))
+                    {
+                        message.Attachments.Add(new Attachment(filePath));
+                    }
+                }
+            }
+
             SmtpClient client = new SmtpClient("smtp.ionos.de");
             client.Port = 587;
             client.Credentials = new System.Net.NetworkCredential("hausbelegung@cvjm-walheim.de", password);
