@@ -13,6 +13,7 @@ namespace CvjmRechnung.Services
             MailMessage message = new MailMessage(from, to);
             message.Subject = subject;
             message.Body = body;
+            message.IsBodyHtml = true;
 
             if (attachments != null)
             {

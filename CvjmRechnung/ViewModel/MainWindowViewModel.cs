@@ -354,13 +354,25 @@ namespace CvjmRechnung.ViewModel
                 return;
             }
 
-            iMailClientService.Send(
-                SelectedItem.EmailAddress,
-                $"Rechnung {SelectedItem.OrderNumber}",
-                "Test",
-                [SelectedItem.InvoicePath + ".pdf"],
-                iConfiguration.Password
-            );
+            string body = File.ReadAllText("resources/mail.html");
+
+            try
+            {
+                iMailClientService.Send(
+                    SelectedItem.EmailAddress,
+                    $"Rechnung {SelectedItem.OrderNumber}",
+                    body,
+                    [SelectedItem.InvoicePath + ".pdf"],
+                    iConfiguration.Password
+                );
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Email konnte nicht gesendet werden", "Email nicht gesendetgesendet", MessageBoxButton.OK, MessageBoxImage.Error);
+
+            }
+
+            MessageBox.Show("Email wurde erfolgreich gesendet", "Email gesendet", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         #endregion

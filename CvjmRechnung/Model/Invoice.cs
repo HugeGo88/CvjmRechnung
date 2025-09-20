@@ -14,22 +14,22 @@ namespace CvjmRechnung.Model
         public string InvoicePath { get; set; }
 
         [ObservableProperty]
-        string orderNumber = "NeueRechnung";
+        string orderNumber = "";
 
         [ObservableProperty]
-        string companyName = "Max Mustermann GmbH";
+        string companyName = "";
 
         [ObservableProperty]
-        string firstAndLastName = "Max Mustermann";
+        string firstAndLastName = "";
 
         [ObservableProperty]
-        string streetAndNumber = "Musterstraße 123";
+        string streetAndNumber = "";
 
         [ObservableProperty]
-        string postalCodeAndCity = "12345 Muststadt";
+        string postalCodeAndCity = "";
 
         [ObservableProperty]
-        string emailAddress = "max@musterman.de";
+        string emailAddress = "";
 
         [ObservableProperty]
         DateTime? date = DateTime.Now;
