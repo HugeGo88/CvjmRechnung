@@ -15,6 +15,8 @@ namespace CvjmRechnung.Services
             message.Body = body;
             message.IsBodyHtml = true;
 
+            message.Bcc.Add("hausbelegung@cvjm-walheim.de");
+
             if (attachments != null)
             {
                 foreach (var filePath in attachments)
