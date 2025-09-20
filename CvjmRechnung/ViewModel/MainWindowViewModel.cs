@@ -368,8 +368,8 @@ namespace CvjmRechnung.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Email konnte nicht gesendet werden", "Email nicht gesendetgesendet", MessageBoxButton.OK, MessageBoxImage.Error);
-
+                MessageBox.Show("Email konnte nicht gesendet werden", "Email nicht gesendet", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
             }
 
             MessageBox.Show("Email wurde erfolgreich gesendet", "Email gesendet", MessageBoxButton.OK, MessageBoxImage.Information);
