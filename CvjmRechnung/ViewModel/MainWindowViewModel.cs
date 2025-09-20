@@ -34,6 +34,8 @@ namespace CvjmRechnung.ViewModel
         ObservableCollection<Invoice> invoices = new();
 
         [ObservableProperty]
+        [NotifyCanExecuteChangedFor(nameof(SaveFileCommand))]
+        [NotifyCanExecuteChangedFor(nameof(GeneratePdfCommand))]
         Invoice selectedItem = new Invoice();
 
         [ObservableProperty]
@@ -302,7 +304,7 @@ namespace CvjmRechnung.ViewModel
             SelectedItem.Date = DateTime.Now;
         }
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(SaveFileAndGenerateMailExcutable))]
         void SaveFile()
         {
             _logger.Info("Save file button pressed");
@@ -314,7 +316,16 @@ namespace CvjmRechnung.ViewModel
             SelectedItem.SaveToXml($"{InvoiceFile}.xml");
         }
 
-        [RelayCommand]
+        private bool SaveFileAndGenerateMailExcutable()
+        {
+            return !string.IsNullOrWhiteSpace(SelectedItem.OrderNumber) &&
+                   !string.IsNullOrWhiteSpace(SelectedItem.FirstAndLastName) &&
+                   !string.IsNullOrWhiteSpace(SelectedItem.StreetAndNumber) &&
+                   !string.IsNullOrWhiteSpace(SelectedItem.PostalCodeAndCity) &&
+                   SelectedItem.InvoiceRows.Count > 0;
+        }
+
+        [RelayCommand(CanExecute = nameof(SaveFileAndGenerateMailExcutable))]
         void GeneratePdf()
         {
             _logger.Info("Generate PDF button pressed");
