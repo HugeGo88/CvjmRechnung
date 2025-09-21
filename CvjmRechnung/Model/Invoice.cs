@@ -13,6 +13,8 @@ namespace CvjmRechnung.Model
 
         public string InvoicePath { get; set; }
 
+        Guid invoiceId = Guid.NewGuid();
+
         [ObservableProperty]
         string orderNumber = "";
 
