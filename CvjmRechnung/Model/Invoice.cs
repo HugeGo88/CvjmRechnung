@@ -6,14 +6,30 @@ using System.Xml.Serialization;
 
 namespace CvjmRechnung.Model
 {
-
     public partial class Invoice : ObservableObject
     {
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-        public string InvoicePath { get; set; }
+        public Invoice(string invoiceFolder)
+        {
+            InvoiceFolder = invoiceFolder;
+            InvoiceRows.CollectionChanged += InvoiceRows_CollectionChanged;
+            InvoiceId = Guid.NewGuid();
+        }
 
-        Guid invoiceId = Guid.NewGuid();
+        public Invoice()
+        {
+            InvoiceId = Guid.NewGuid();
+            InvoiceRows.CollectionChanged += InvoiceRows_CollectionChanged;
+        }
+
+        public string InvoiceFolder { get; set; }
+
+        public string PdfPath { get => @$"{InvoiceFolder}/{OrderNumber}.pdf"; }
+
+        public string XmlPath { get => @$"{InvoiceFolder}/_xml/{InvoiceId}.xml"; }
+
+        public Guid InvoiceId { get => _invoiceId; set => _invoiceId = value; }
 
         [ObservableProperty]
         string orderNumber = "";
@@ -38,11 +54,7 @@ namespace CvjmRechnung.Model
 
         [ObservableProperty]
         ObservableCollection<InvoiceRow> invoiceRows = new();
-
-        public Invoice()
-        {
-            InvoiceRows.CollectionChanged += InvoiceRows_CollectionChanged;
-        }
+        private Guid _invoiceId;
 
         private void InvoiceRows_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -57,23 +69,18 @@ namespace CvjmRechnung.Model
             }
         }
 
-        public void SaveToXml(string filePath)
+        public void SaveToXml()
         {
-            string directory = Path.GetDirectoryName(filePath);
-            if (!Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
             var serializer = new XmlSerializer(typeof(Invoice));
-            using var stream = new FileStream(filePath, FileMode.Create);
+            using var stream = new FileStream(XmlPath, FileMode.Create);
             serializer.Serialize(stream, this);
-            _logger.Debug($"Invoice saved to {filePath}");
+            _logger.Debug($"Invoice saved to {XmlPath}");
         }
 
         public Invoice LoadFromXml(string filePath)
         {
             if (!Path.Exists(filePath))
-                return new Invoice();
+                return new Invoice(InvoiceFolder);
             var serializer = new XmlSerializer(typeof(Invoice));
             using var stream = new FileStream(filePath, FileMode.Open);
             _logger.Debug($"Invoice loaded from {filePath}");

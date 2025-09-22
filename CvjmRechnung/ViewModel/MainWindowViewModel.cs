@@ -29,7 +29,6 @@ namespace CvjmRechnung.ViewModel
         #region Properties
 
         public string InvoiceFolder { get => Path.Combine(Path.Combine(Directory.GetParent(Environment.CurrentDirectory).ToString(), "Rechnungen")); }
-        public string InvoiceFile { get => Path.Combine(InvoiceFolder, $"Rechnung_{SelectedItem.OrderNumber}"); }
 
         [ObservableProperty]
         ObservableCollection<Invoice> invoices = new();
@@ -59,6 +58,14 @@ namespace CvjmRechnung.ViewModel
         //public MainWindowViewModel(IMailClient mailClient)
         public MainWindowViewModel(IMailClient mailClientService, IConfiguration configuration)
         {
+            if (!Path.Exists(InvoiceFolder))
+            {
+                Directory.CreateDirectory(InvoiceFolder);
+            }
+            if (!Path.Exists(InvoiceFolder + "\\_xml"))
+            {
+                Directory.CreateDirectory(InvoiceFolder + "\\_xml");
+            }
             LoadInvoiceFolder();
             iMailClientService = mailClientService;
             iConfiguration = configuration;
@@ -70,12 +77,7 @@ namespace CvjmRechnung.ViewModel
         #region methods
         private void LoadInvoiceFolder()
         {
-            if (!Directory.Exists(InvoiceFolder))
-            {
-                Directory.CreateDirectory(InvoiceFolder);
-            }
-
-            var invoiceFiles = Directory.GetFiles(InvoiceFolder, "*.xml");
+            var invoiceFiles = Directory.GetFiles(InvoiceFolder + "\\_xml", "*.xml");
             var serializer = new XmlSerializer(typeof(Invoice));
             Invoices.Clear();
 
@@ -84,6 +86,7 @@ namespace CvjmRechnung.ViewModel
                 using var stream = new FileStream(file, FileMode.Open);
                 if (serializer.Deserialize(stream) is Invoice invoice)
                 {
+                    invoice.InvoiceFolder = InvoiceFolder;
                     Invoices.Add(invoice);
                 }
             }
@@ -94,11 +97,11 @@ namespace CvjmRechnung.ViewModel
             PdfPath = _emptyPdf;
             if (value is null) { return; }
 
-            if (value.InvoicePath is null) { return; }
+            if (value.PdfPath is null) { return; }
 
-            if (!Path.Exists($"{value.InvoicePath}.pdf")) { return; }
+            if (!Path.Exists(value.PdfPath)) { return; }
 
-            PdfPath = $"{value.InvoicePath}.pdf";
+            PdfPath = value.PdfPath;
         }
 
         private void RenderPdf(string content)
@@ -115,7 +118,7 @@ namespace CvjmRechnung.ViewModel
             ProcessStartInfo ps = new ProcessStartInfo()
             {
                 FileName = pathToExe,
-                Arguments = $"--headless --disable-gpu --print-to-pdf-no-header --run-all-compositor-stages-before-draw --virtual-time-budget=5000 --print-to-pdf=\"{InvoiceFile}.pdf\" \"{templatePathHtml}\"",
+                Arguments = $"--headless --disable-gpu --print-to-pdf-no-header --run-all-compositor-stages-before-draw --virtual-time-budget=5000 --print-to-pdf=\"{SelectedItem.PdfPath}\" \"{templatePathHtml}\"",
                 CreateNoWindow = true,
                 UseShellExecute = false
             };
@@ -130,7 +133,7 @@ namespace CvjmRechnung.ViewModel
             }
             else
             {
-                PdfPath = $"{InvoiceFile}.pdf";
+                PdfPath = SelectedItem.PdfPath;
             }
         }
 
@@ -309,12 +312,7 @@ namespace CvjmRechnung.ViewModel
         void SaveFile()
         {
             _logger.Info("Save file button pressed");
-            if (!Path.Exists(InvoiceFolder))
-            {
-                Directory.CreateDirectory(InvoiceFolder);
-            }
-            SelectedItem.InvoicePath = InvoiceFile;
-            SelectedItem.SaveToXml($"{InvoiceFile}.xml");
+            SelectedItem.SaveToXml();
         }
 
         private bool SaveFileAndGenerateMailExcutable()
@@ -343,7 +341,7 @@ namespace CvjmRechnung.ViewModel
         {
             _logger.Info("Add new invoice button pressed");
             if (Invoices is null) { return; }
-            Invoices.Add(new Invoice());
+            Invoices.Add(new Invoice(InvoiceFolder));
             OnPropertyChanged(nameof(Invoices));
             SelectedItem = Invoices.Last();
         }
@@ -375,7 +373,7 @@ namespace CvjmRechnung.ViewModel
                     SelectedItem.EmailAddress,
                     $"Rechnung {SelectedItem.OrderNumber}",
                     body,
-                    [SelectedItem.InvoicePath + ".pdf"],
+                    [SelectedItem.PdfPath],
                     iConfiguration.Password
                 );
             }
@@ -393,12 +391,34 @@ namespace CvjmRechnung.ViewModel
         {
             if (e.Key == Key.Delete && SelectedItem != null && Invoices.Contains(SelectedItem))
             {
-                // (delete logic as before)
+                var result = MessageBox.Show(
+                    "Soll die Rechnung wirklich gelöscht werden?",
+                    "Löschen",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question
+);
+
+                if (result != MessageBoxResult.Yes)
+                {
+                    _logger.Info("Delete invoice canceled by user.");
+                    return;
+                }
+
+                // Delete corresponding files
+                if (!string.IsNullOrWhiteSpace(SelectedItem.PdfPath) && File.Exists(SelectedItem.PdfPath))
+                {
+                    File.Delete(SelectedItem.PdfPath);
+                }
+                if (!string.IsNullOrWhiteSpace(SelectedItem.XmlPath) && File.Exists(SelectedItem.XmlPath))
+                {
+                    File.Delete(SelectedItem.XmlPath);
+                }
+
                 Invoices.Remove(SelectedItem);
                 if (Invoices.Count > 0)
                     SelectedItem = Invoices.Last();
                 else
-                    SelectedItem = new Invoice();
+                    SelectedItem = new Invoice(InvoiceFolder);
                 e.Handled = true;
             }
         }
