@@ -40,6 +40,11 @@
                     Grid.Column="0"
                     ItemsSource="{Binding Invoices}"
                     SelectedItem="{Binding SelectedItem}">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="KeyUp">
+                            <i:InvokeCommandAction Command="{Binding DeleteSelectedInvoiceCommand}" PassEventArgsToCommand="True" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
                     <ListView.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>

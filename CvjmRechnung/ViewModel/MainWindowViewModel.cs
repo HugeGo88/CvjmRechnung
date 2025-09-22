@@ -11,6 +11,7 @@ using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Windows;
+using System.Windows.Input;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -318,6 +319,7 @@ namespace CvjmRechnung.ViewModel
 
         private bool SaveFileAndGenerateMailExcutable()
         {
+            return true;
             return !string.IsNullOrWhiteSpace(SelectedItem.OrderNumber) &&
                    !string.IsNullOrWhiteSpace(SelectedItem.FirstAndLastName) &&
                    !string.IsNullOrWhiteSpace(SelectedItem.StreetAndNumber) &&
@@ -384,6 +386,21 @@ namespace CvjmRechnung.ViewModel
             }
 
             MessageBox.Show("Email wurde erfolgreich gesendet", "Email gesendet", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        [RelayCommand]
+        void DeleteSelectedInvoice(KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete && SelectedItem != null && Invoices.Contains(SelectedItem))
+            {
+                // (delete logic as before)
+                Invoices.Remove(SelectedItem);
+                if (Invoices.Count > 0)
+                    SelectedItem = Invoices.Last();
+                else
+                    SelectedItem = new Invoice();
+                e.Handled = true;
+            }
         }
 
         #endregion
