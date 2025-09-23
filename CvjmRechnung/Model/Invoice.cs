@@ -25,9 +25,9 @@ namespace CvjmRechnung.Model
 
         public string InvoiceFolder { get; set; }
 
-        public string PdfPath { get => @$"{InvoiceFolder}/{OrderNumber}.pdf"; }
+        public string PdfPath { get => @$"{InvoiceFolder}\{InvoiceId}.pdf"; }
 
-        public string XmlPath { get => @$"{InvoiceFolder}/_xml/{InvoiceId}.xml"; }
+        public string XmlPath { get => @$"{InvoiceFolder}\{InvoiceId}.xml"; }
 
         public Guid InvoiceId { get => _invoiceId; set => _invoiceId = value; }
 

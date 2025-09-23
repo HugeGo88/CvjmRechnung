@@ -62,10 +62,6 @@ namespace CvjmRechnung.ViewModel
             {
                 Directory.CreateDirectory(InvoiceFolder);
             }
-            if (!Path.Exists(InvoiceFolder + "\\_xml"))
-            {
-                Directory.CreateDirectory(InvoiceFolder + "\\_xml");
-            }
             LoadInvoiceFolder();
             iMailClientService = mailClientService;
             iConfiguration = configuration;
@@ -77,7 +73,7 @@ namespace CvjmRechnung.ViewModel
         #region methods
         private void LoadInvoiceFolder()
         {
-            var invoiceFiles = Directory.GetFiles(InvoiceFolder + "\\_xml", "*.xml");
+            var invoiceFiles = Directory.GetFiles(InvoiceFolder, "*.xml");
             var serializer = new XmlSerializer(typeof(Invoice));
             Invoices.Clear();
 
