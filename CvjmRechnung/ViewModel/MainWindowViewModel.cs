@@ -313,12 +313,7 @@ namespace CvjmRechnung.ViewModel
 
         private bool SaveFileAndGenerateMailExcutable()
         {
-            return true;
-            return !string.IsNullOrWhiteSpace(SelectedItem.OrderNumber) &&
-                   !string.IsNullOrWhiteSpace(SelectedItem.FirstAndLastName) &&
-                   !string.IsNullOrWhiteSpace(SelectedItem.StreetAndNumber) &&
-                   !string.IsNullOrWhiteSpace(SelectedItem.PostalCodeAndCity) &&
-                   SelectedItem.InvoiceRows.Count > 0;
+            return SelectedItem.InvoiceFolder is not null;
         }
 
         [RelayCommand(CanExecute = nameof(SaveFileAndGenerateMailExcutable))]
