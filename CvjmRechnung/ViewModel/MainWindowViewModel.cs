@@ -86,7 +86,7 @@ namespace CvjmRechnung.ViewModel
                     Invoices.Add(invoice);
                 }
             }
-            Invoices = new ObservableCollection<Invoice>(Invoices.OrderByDescending(x => x.OrderNumber));
+            Invoices = new ObservableCollection<Invoice>(Invoices.OrderBy(x => x.OrderNumber).Reverse().ToList());
         }
 
         partial void OnSelectedItemChanged(Invoice value)
@@ -321,12 +321,14 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand(CanExecute = nameof(SaveFileAndGenerateMailExcutable))]
         void GeneratePdf()
         {
+            Mouse.OverrideCursor = Cursors.Wait;
             _logger.Info("Generate PDF button pressed");
             CalculatePrice();
             PdfPath = _emptyPdf;
             string content = GetHtmlCodeForInvoice();
             RenderPdf(content);
             SaveFile();
+            Mouse.OverrideCursor = null;
         }
 
         [RelayCommand]

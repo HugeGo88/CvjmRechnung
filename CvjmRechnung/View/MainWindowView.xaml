@@ -40,6 +40,24 @@
                     Grid.Column="0"
                     ItemsSource="{Binding Invoices}"
                     SelectedItem="{Binding SelectedItem}">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding State}" Value="SAVED">
+                                    <Setter Property="Background" Value="LightBlue" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding State}" Value="PDF_CREATED">
+                                    <Setter Property="Background" Value="LightYellow" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding State}" Value="EMAIL_SEND">
+                                    <Setter Property="Background" Value="LightCoral" />
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding State}" Value="INVOICE_PAID">
+                                    <Setter Property="Background" Value="LightGreen" />
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <i:Interaction.Triggers>
                         <i:EventTrigger EventName="KeyUp">
                             <i:InvokeCommandAction Command="{Binding DeleteSelectedInvoiceCommand}" PassEventArgsToCommand="True" />

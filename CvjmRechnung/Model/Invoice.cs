@@ -83,11 +83,11 @@ namespace CvjmRechnung.Model
 
         public void SaveToXml()
         {
+            if (State == InvoiceState.NEW_INVOICE)
+                State = InvoiceState.SAVED;
             var serializer = new XmlSerializer(typeof(Invoice));
             using var stream = new FileStream(XmlPath, FileMode.Create);
             serializer.Serialize(stream, this);
-            if (State == InvoiceState.NEW_INVOICE)
-                State = InvoiceState.SAVED;
             _logger.Debug($"Invoice saved to {XmlPath}");
         }
 
