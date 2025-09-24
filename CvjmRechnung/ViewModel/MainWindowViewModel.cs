@@ -86,7 +86,7 @@ namespace CvjmRechnung.ViewModel
                     Invoices.Add(invoice);
                 }
             }
-            Invoices = new ObservableCollection<Invoice>(Invoices.OrderBy(x => x.OrderNumber).Reverse().ToList());
+            Invoices = new ObservableCollection<Invoice>(Invoices.OrderBy(x => x.Date).Reverse().ToList());
         }
 
         partial void OnSelectedItemChanged(Invoice value)

@@ -67,7 +67,9 @@
                         <DataTemplate>
                             <StackPanel>
                                 <WrapPanel>
-                                    <TextBlock Text="Rechnung: " />
+                                    <TextBlock Text="Datum: " />
+                                    <TextBlock FontWeight="Bold" Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy}'}" />
+                                    <TextBlock Text=" Rechnung: " />
                                     <TextBlock FontWeight="Bold" Text="{Binding OrderNumber}" />
                                 </WrapPanel>
                                 <WrapPanel>
