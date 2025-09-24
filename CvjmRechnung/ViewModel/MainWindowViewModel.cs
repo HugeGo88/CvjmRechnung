@@ -86,6 +86,7 @@ namespace CvjmRechnung.ViewModel
                     Invoices.Add(invoice);
                 }
             }
+            Invoices = new ObservableCollection<Invoice>(Invoices.OrderByDescending(x => x.OrderNumber));
         }
 
         partial void OnSelectedItemChanged(Invoice value)
@@ -129,6 +130,7 @@ namespace CvjmRechnung.ViewModel
             }
             else
             {
+                SelectedItem.State = InvoiceState.PDF_CREATED;
                 PdfPath = SelectedItem.PdfPath;
             }
         }
@@ -374,7 +376,15 @@ namespace CvjmRechnung.ViewModel
                 return;
             }
 
+            SelectedItem.State = InvoiceState.EMAIL_SEND;
             MessageBox.Show("Email wurde erfolgreich gesendet", "Email gesendet", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        [RelayCommand]
+        void InvoicePaid()
+        {
+            _logger.Info("Invoice paid button pressed");
+            SelectedItem.State = InvoiceState.INVOICE_PAID;
         }
 
         [RelayCommand]

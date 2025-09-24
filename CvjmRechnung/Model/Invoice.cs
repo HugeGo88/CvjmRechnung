@@ -6,6 +6,15 @@ using System.Xml.Serialization;
 
 namespace CvjmRechnung.Model
 {
+    public enum InvoiceState
+    {
+        NEW_INVOICE,
+        SAVED,
+        PDF_CREATED,
+        EMAIL_SEND,
+        INVOICE_PAID
+    }
+
     public partial class Invoice : ObservableObject
     {
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
@@ -53,6 +62,9 @@ namespace CvjmRechnung.Model
         DateTime? date = DateTime.Now;
 
         [ObservableProperty]
+        InvoiceState state;
+
+        [ObservableProperty]
         ObservableCollection<InvoiceRow> invoiceRows = new();
         private Guid _invoiceId;
 
@@ -74,6 +86,8 @@ namespace CvjmRechnung.Model
             var serializer = new XmlSerializer(typeof(Invoice));
             using var stream = new FileStream(XmlPath, FileMode.Create);
             serializer.Serialize(stream, this);
+            if (State == InvoiceState.NEW_INVOICE)
+                State = InvoiceState.SAVED;
             _logger.Debug($"Invoice saved to {XmlPath}");
         }
 

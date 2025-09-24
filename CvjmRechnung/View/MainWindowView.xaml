@@ -56,6 +56,10 @@
                                     <TextBlock Text="Name: " />
                                     <TextBlock FontWeight="Bold" Text="{Binding FirstAndLastName}" />
                                 </WrapPanel>
+                                <WrapPanel>
+                                    <TextBlock Text="Status: " />
+                                    <TextBlock FontWeight="Bold" Text="{Binding State}" />
+                                </WrapPanel>
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>
@@ -153,21 +157,12 @@
                         <Label Content="{Binding TotalAmount}" FontWeight="Bold" />
                         <Label Content="€" FontStyle="Oblique" />
                     </StackPanel>
-                    <Button
-                        Grid.Row="1"
-                        Command="{Binding SaveFileCommand}"
-                        Content="Speichern" />
-                    <Button
-                        Grid.Row="1"
-                        Grid.Column="1"
-                        Command="{Binding GeneratePdfCommand}"
-                        Content="PDF erzeugen" />
-                    <Button
-                        Grid.Row="2"
-                        Grid.ColumnSpan="2"
-                        Command="{Binding SendMailCommand}"
-                        Content="Rechnung via Email senden"
-                        IsEnabled="True" />
+                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
+                        <Button Command="{Binding SaveFileCommand}" Content="Speichern" />
+                        <Button Command="{Binding GeneratePdfCommand}" Content="PDF erzeugen" />
+                        <Button Command="{Binding SendMailCommand}" Content="Rechnung via Email senden" />
+                        <Button Command="{Binding InvoicePaidCommand}" Content="Rechnung als bezahlt markieren" />
+                    </StackPanel>
                 </Grid>
             </Grid>
         </Grid>
