@@ -97,7 +97,7 @@
                         <TextBox Grid.Column="0" Text="{Binding SelectedItem.OrderNumber}" />
                         <Button
                             Grid.Column="1"
-                            Command="{Binding ReadCalendarCommand}"
+                            Command="{Binding SearchEventCommand}"
                             Content="Suchen" />
                     </Grid>
                     <Label Content="Firmenname" />

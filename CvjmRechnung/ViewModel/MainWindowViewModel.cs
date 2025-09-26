@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CvjmRechnung.Interfaces;
 using CvjmRechnung.Model;
+using CvjmRechnung.View;
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Win32;
 using QRCoder;
@@ -332,13 +333,36 @@ namespace CvjmRechnung.ViewModel
         }
 
         [RelayCommand]
-        void AddNewInvoice()
+        async Task AddNewInvoice()
         {
+            var selectionWindow = new InvoicesView();
+            bool? dialogResult = selectionWindow.ShowDialog();
+
             _logger.Info("Add new invoice button pressed");
             if (Invoices is null) { return; }
             Invoices.Add(new Invoice(InvoiceFolder));
             OnPropertyChanged(nameof(Invoices));
             SelectedItem = Invoices.Last();
+
+            if (dialogResult == true)
+            {
+                object selectedItem = selectionWindow.SelectedEventItem;
+                _logger.Info($"Selected item retrieved: {selectedItem.ToString()}");
+                SelectedItem.OrderNumber = ((EventDetails)selectedItem).EventId;
+                SelectedItem.CompanyName = ((EventDetails)selectedItem).EventName;
+                SelectedItem.FirstAndLastName = ((EventDetails)selectedItem).Name;
+                SelectedItem.StreetAndNumber = ((EventDetails)selectedItem).Street;
+                SelectedItem.PostalCodeAndCity = ((EventDetails)selectedItem).City;
+                SelectedItem.EmailAddress = ((EventDetails)selectedItem).Email;
+            }
+            else if (dialogResult == false)
+            {
+                _logger.Info("Selection was cancelled.");
+            }
+            else // dialogResult == null
+            {
+                _logger.Info("Dialog was closed without a definitive result.");
+            }
         }
 
         [RelayCommand]
@@ -390,7 +414,7 @@ namespace CvjmRechnung.ViewModel
         }
 
         [RelayCommand]
-        async Task ReadCalendar()
+        async Task SearchEvent()
         {
             Mouse.OverrideCursor = Cursors.Wait;
 
@@ -410,40 +434,7 @@ namespace CvjmRechnung.ViewModel
                 return;
             }
 
-            IcsReader icsReader = new IcsReader();
-            List<EventDetails> eventDetails = new List<EventDetails>();
-            List<Ical.Net.CalendarComponents.CalendarEvent> events = await icsReader.ReadIcsFromUrl("http://cvjm-walheim.de/buchungen");
-            foreach (var elem in events)
-            {
-                _logger.Info($"ID: {elem.Uid}  {Environment.NewLine}Description: {elem.Description}");
-                EventDetails eventDetail = new EventDetails();
-                foreach (var line in elem.Description.Split("\n"))
-                {
-                    var trimedLine = line.Trim();
-                    if (trimedLine.StartsWith("Veranstaltungsname:"))
-                    {
-                        eventDetail.EventName = trimedLine.Replace("Veranstaltungsname:", "").Trim();
-                    }
-                    else if (trimedLine.StartsWith("Vor- und Nachname:"))
-                    {
-                        eventDetail.Name = trimedLine.Replace("Vor- und Nachname:", "").Trim();
-                    }
-                    else if (trimedLine.StartsWith("Straße und Hausnummer:"))
-                    {
-                        eventDetail.Street = trimedLine.Replace("Straße und Hausnummer:", "").Trim();
-                    }
-                    else if (trimedLine.StartsWith("PLZ und Ort:"))
-                    {
-                        eventDetail.City = trimedLine.Replace("PLZ und Ort:", "").Trim();
-                    }
-                    else if (trimedLine.StartsWith("Email:"))
-                    {
-                        eventDetail.Email = trimedLine.Replace("Email:", "").Trim();
-                    }
-                }
-                eventDetail.EventId = elem.Uid.Split("@").First();
-                eventDetails.Add(eventDetail);
-            }
+            List<EventDetails> eventDetails = await EventDetails.GetEventDetails();
 
             if (eventDetails.Any(x => x.EventId.Trim() == SelectedItem.OrderNumber.Trim()))
             {
