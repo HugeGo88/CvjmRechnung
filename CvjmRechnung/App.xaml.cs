@@ -17,9 +17,54 @@ namespace CvjmRechnung
         public App()
         {
             _logger.Info("***** PROGRAM STARTED *****");
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Services = ConfigureServices();
+            // Subscribe to unobserved task exceptions
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
 
             this.InitializeComponent();
+        }
+
+        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            _logger.Error(e.Exception, "Unobserved task exception occurred");
+            // Log the exception (e.Exception)
+            MessageBox.Show($"Background Task Error: {e.Exception.InnerException?.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+            // Mark the exception as observed to prevent the process from crashing
+            e.SetObserved();
+        }
+
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            // Subscribe to the DispatcherUnhandledException event
+            this.DispatcherUnhandledException += App_DispatcherUnhandledException;
+            base.OnStartup(e);
+        }
+
+        private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
+        {
+            _logger.Error(e.Exception, "Unhandled UI exception occurred");
+
+            // Log the exception details
+            MessageBox.Show($"UI Error: {e.Exception.Message}\nApplication will attempt to continue.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+            // Optionally prevent the crash. Use with caution!
+            e.Handled = true;
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            // Get the exception object
+            Exception ex = e.ExceptionObject as Exception;
+
+            _logger.Error(ex, "Unhandled exception occurred");
+
+            // Log the exception details and inform the user
+            MessageBox.Show($"Fatal Error (AppDomain): {ex?.Message}\nApplication is shutting down.", "Fatal Error", MessageBoxButton.OK, MessageBoxImage.Error);
+
+            // Optionally, perform cleanup or logging before the application terminates
+            // ...
         }
 
         /// <summary>
