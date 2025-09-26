@@ -30,9 +30,6 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Grid.Column="0">
-                    <Button Command="{Binding AddNewInvoiceCommand}" Content="Neue Rechnung" />
-                </StackPanel>
                 <ListView
                     Grid.Row="1"
                     Grid.Column="0"
@@ -90,6 +87,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <StackPanel Margin="5">
+                    <Button Command="{Binding AddNewInvoiceCommand}" Content="Neue Rechnung" />
                     <Label Content="Reservierungs- oder Rechnungsnummer" />
                     <Grid>
                         <Grid.ColumnDefinitions>
