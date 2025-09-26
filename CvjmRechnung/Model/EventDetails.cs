@@ -12,6 +12,7 @@
         public string City { get; set; }
         public string EventId { get; set; }
         public string Email { get; set; }
+        public string Description { get; set; }
         public override string ToString()
         {
             return $"EventId: {EventId} Name: {Name}";
@@ -51,6 +52,7 @@
                     }
                 }
                 eventDetail.EventId = elem.Uid.Split("@").First();
+                eventDetail.Description = elem.Description;
                 eventDetails.Add(eventDetail);
             }
 

@@ -354,6 +354,7 @@ namespace CvjmRechnung.ViewModel
                 SelectedItem.StreetAndNumber = ((EventDetails)selectedItem).Street;
                 SelectedItem.PostalCodeAndCity = ((EventDetails)selectedItem).City;
                 SelectedItem.EmailAddress = ((EventDetails)selectedItem).Email;
+                SelectedItem.Description = ((EventDetails)selectedItem).Description;
             }
             else if (dialogResult == false)
             {
@@ -444,6 +445,7 @@ namespace CvjmRechnung.ViewModel
                 SelectedItem.StreetAndNumber = foundEvent.Street;
                 SelectedItem.PostalCodeAndCity = foundEvent.City;
                 SelectedItem.EmailAddress = foundEvent.Email;
+                SelectedItem.Description = foundEvent.Description;
             }
             else
             {

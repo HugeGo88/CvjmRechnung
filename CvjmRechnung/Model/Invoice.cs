@@ -59,6 +59,9 @@ namespace CvjmRechnung.Model
         string emailAddress = "";
 
         [ObservableProperty]
+        string description = "";
+
+        [ObservableProperty]
         DateTime? date = DateTime.Now;
 
         [ObservableProperty]

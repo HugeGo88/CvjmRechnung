@@ -88,29 +88,34 @@
                 </Grid.RowDefinitions>
                 <StackPanel Margin="5">
                     <Button Command="{Binding AddNewInvoiceCommand}" Content="Neue Rechnung" />
-                    <Label Content="Reservierungs- oder Rechnungsnummer" />
+                    <Label Content="Reservierungs- oder Rechnungsnummer" FontWeight="Bold" />
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <TextBox Grid.Column="0" Text="{Binding SelectedItem.OrderNumber}" />
+                        <TextBox
+                            Grid.Column="0"
+                            FontWeight="Bold"
+                            Text="{Binding SelectedItem.OrderNumber}" />
                         <Button
                             Grid.Column="1"
                             Command="{Binding SearchEventCommand}"
                             Content="Suchen" />
                     </Grid>
-                    <Label Content="Firmenname" />
+                    <Label Content="Firmenname" FontWeight="Bold" />
                     <TextBox Text="{Binding SelectedItem.CompanyName}" />
-                    <Label Content="Vor- und Nachname" />
+                    <Label Content="Vor- und Nachname" FontWeight="Bold" />
                     <TextBox Text="{Binding SelectedItem.FirstAndLastName}" />
-                    <Label Content="Straße und Hausnummer" />
+                    <Label Content="Straße und Hausnummer" FontWeight="Bold" />
                     <TextBox Text="{Binding SelectedItem.StreetAndNumber}" />
-                    <Label Content="PLZ und Ort" />
+                    <Label Content="PLZ und Ort" FontWeight="Bold" />
                     <TextBox Text="{Binding SelectedItem.PostalCodeAndCity}" />
-                    <Label Content="Email" />
+                    <Label Content="Email" FontWeight="Bold" />
                     <TextBox Text="{Binding SelectedItem.EmailAddress}" />
-                    <Label Content="Rechnungsdatum" />
+                    <Label Content="Beschreibung" FontWeight="Bold" />
+                    <TextBlock Text="{Binding SelectedItem.Description}" TextWrapping="Wrap" />
+                    <Label Content="Rechnungsdatum" FontWeight="Bold" />
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition />
