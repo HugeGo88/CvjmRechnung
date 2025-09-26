@@ -390,6 +390,82 @@ namespace CvjmRechnung.ViewModel
         }
 
         [RelayCommand]
+        async Task ReadCalendar()
+        {
+            Mouse.OverrideCursor = Cursors.Wait;
+
+            try
+            {
+                int.Parse(SelectedItem.OrderNumber);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "Odernumber was not an integer");
+                Mouse.OverrideCursor = null;
+                MessageBox.Show(
+                    "Die eingegebene ID ist keine Zahl. Bitte alle Buchstaben löschen und nur eine Zahl eingeben",
+                    "Fehlerhafte ID",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+                return;
+            }
+
+            IcsReader icsReader = new IcsReader();
+            List<EventDetails> eventDetails = new List<EventDetails>();
+            List<Ical.Net.CalendarComponents.CalendarEvent> events = await icsReader.ReadIcsFromUrl("http://cvjm-walheim.de/buchungen");
+            foreach (var elem in events)
+            {
+                _logger.Info($"ID: {elem.Uid}  {Environment.NewLine}Description: {elem.Description}");
+                EventDetails eventDetail = new EventDetails();
+                foreach (var line in elem.Description.Split("\n"))
+                {
+                    var trimedLine = line.Trim();
+                    if (trimedLine.StartsWith("Veranstaltungsname:"))
+                    {
+                        eventDetail.EventName = trimedLine.Replace("Veranstaltungsname:", "").Trim();
+                    }
+                    else if (trimedLine.StartsWith("Vor- und Nachname:"))
+                    {
+                        eventDetail.Name = trimedLine.Replace("Vor- und Nachname:", "").Trim();
+                    }
+                    else if (trimedLine.StartsWith("Straße und Hausnummer:"))
+                    {
+                        eventDetail.Street = trimedLine.Replace("Straße und Hausnummer:", "").Trim();
+                    }
+                    else if (trimedLine.StartsWith("PLZ und Ort:"))
+                    {
+                        eventDetail.City = trimedLine.Replace("PLZ und Ort:", "").Trim();
+                    }
+                    else if (trimedLine.StartsWith("Email:"))
+                    {
+                        eventDetail.Email = trimedLine.Replace("Email:", "").Trim();
+                    }
+                }
+                eventDetail.EventId = elem.Uid.Split("@").First();
+                eventDetails.Add(eventDetail);
+            }
+
+            if (eventDetails.Any(x => x.EventId.Trim() == SelectedItem.OrderNumber.Trim()))
+            {
+                EventDetails foundEvent = eventDetails.First(x => x.EventId.Trim() == SelectedItem.OrderNumber.Trim());
+                SelectedItem.CompanyName = foundEvent.EventName;
+                SelectedItem.FirstAndLastName = foundEvent.Name;
+                SelectedItem.StreetAndNumber = foundEvent.Street;
+                SelectedItem.PostalCodeAndCity = foundEvent.City;
+                SelectedItem.EmailAddress = foundEvent.Email;
+            }
+            else
+            {
+                MessageBox.Show(
+                    "Die eingegebene ID konnte nicht gefunden werden",
+                    "Buchung nicht gefunden",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            Mouse.OverrideCursor = null;
+        }
+
+        [RelayCommand]
         void DeleteSelectedInvoice(KeyEventArgs e)
         {
             if (e.Key == Key.Delete && SelectedItem != null && Invoices.Contains(SelectedItem))

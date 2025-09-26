@@ -30,11 +30,9 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Button
-                    Grid.Row="0"
-                    Grid.Column="0"
-                    Command="{Binding AddNewInvoiceCommand}"
-                    Content="Neue Rechnung" />
+                <StackPanel Grid.Row="0" Grid.Column="0">
+                    <Button Command="{Binding AddNewInvoiceCommand}" Content="Neue Rechnung" />
+                </StackPanel>
                 <ListView
                     Grid.Row="1"
                     Grid.Column="0"
@@ -93,7 +91,17 @@
                 </Grid.RowDefinitions>
                 <StackPanel Margin="5">
                     <Label Content="Reservierungs- oder Rechnungsnummer" />
-                    <TextBox Text="{Binding SelectedItem.OrderNumber}" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding SelectedItem.OrderNumber}" />
+                        <Button
+                            Grid.Column="1"
+                            Command="{Binding ReadCalendarCommand}"
+                            Content="Suchen" />
+                    </Grid>
                     <Label Content="Firmenname" />
                     <TextBox Text="{Binding SelectedItem.CompanyName}" />
                     <Label Content="Vor- und Nachname" />
