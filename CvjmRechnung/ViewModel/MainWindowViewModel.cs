@@ -248,7 +248,7 @@ namespace CvjmRechnung.ViewModel
 
             // Add payment info <p>
             var paymentInfo = xmlDoc.CreateElement("p");
-            paymentInfo.InnerText = "Der Gesamtbetrag ist ab Erhalt der Rechnung zahlbar innerhalb von 10 Tagen ohne Abzug.";
+            paymentInfo.InnerText = "Der Gesamtbetrag ist ab Erhalt der Rechnung zahlbar innerhalb von 10 Tagen ohne Abzug. Bitte geben Sie bei der Überweisung die Rechnungsnummer mit an. Gerne können Sie den QR Code mit Ihrer Banking App nutzen.";
             rootDiv.AppendChild(paymentInfo);
 
             // Add root to document
