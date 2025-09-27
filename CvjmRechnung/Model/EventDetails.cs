@@ -13,6 +13,8 @@
         public string EventId { get; set; }
         public string Email { get; set; }
         public string Description { get; set; }
+        public DateTime StartDate { get; set; }
+        public string StartDateString { get => StartDate.ToString("dd.MM.yyyy"); }
         public override string ToString()
         {
             return $"EventId: {EventId} Name: {Name}";
@@ -53,10 +55,11 @@
                 }
                 eventDetail.EventId = elem.Uid.Split("@").First();
                 eventDetail.Description = elem.Description;
+                eventDetail.StartDate = elem.DtStart.Value.Date;
                 eventDetails.Add(eventDetail);
             }
 
-            return eventDetails;
+            return eventDetails.OrderBy(x => x.StartDate).Reverse().ToList();
         }
 
     }

@@ -13,14 +13,22 @@
         <ListView
             x:Name="ListViewItems"
             Grid.Row="1"
-            MouseDoubleClick="ListViewItems_MouseDoubleClick"
-            Grid.Column="1">
+            Grid.Column="1"
+            MouseDoubleClick="ListViewItems_MouseDoubleClick">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel>
                         <WrapPanel>
+                            <TextBlock Text="Beginn: " />
+                            <TextBlock FontWeight="Bold" Text="{Binding StartDateString}" />
+                        </WrapPanel>
+                        <WrapPanel>
                             <TextBlock Text="Reservierungsnummer: " />
                             <TextBlock FontWeight="Bold" Text="{Binding EventId}" />
+                        </WrapPanel>
+                        <WrapPanel>
+                            <TextBlock Text="Veranstaltungsname: " />
+                            <TextBlock FontWeight="Bold" Text="{Binding EventName}" />
                         </WrapPanel>
                         <WrapPanel>
                             <TextBlock Text="Name: " />
