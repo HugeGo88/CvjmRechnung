@@ -15,6 +15,8 @@
         public string Description { get; set; }
         public DateTime StartDate { get; set; }
         public string StartDateString { get => StartDate.ToString("dd.MM.yyyy"); }
+        public DateTime EndDate { get; set; }
+        public string EndDateString { get => EndDate.ToString("dd.MM.yyyy"); }
         public override string ToString()
         {
             return $"EventId: {EventId} Name: {Name}";
@@ -54,8 +56,9 @@
                     }
                 }
                 eventDetail.EventId = elem.Uid.Split("@").First();
-                eventDetail.Description = elem.Description;
                 eventDetail.StartDate = elem.DtStart.Value.Date;
+                eventDetail.EndDate = elem.DtEnd.Value.Date;
+                eventDetail.Description = $"{elem.Description} Start: {eventDetail.StartDateString} \n Ende: {eventDetail.EndDateString}";
                 eventDetails.Add(eventDetail);
             }
 
