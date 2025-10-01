@@ -62,7 +62,7 @@
                 eventDetails.Add(eventDetail);
             }
 
-            return eventDetails.OrderBy(x => x.StartDate).Reverse().ToList();
+            return eventDetails.OrderBy(x => x.StartDate).ToList();
         }
 
     }
