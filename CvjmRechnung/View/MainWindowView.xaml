@@ -80,122 +80,125 @@
                     </ListView.ItemTemplate>
                 </ListView>
             </Grid>
-            <Grid Grid.Column="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <StackPanel Margin="5">
-                    <Button Command="{Binding AddNewInvoiceCommand}" Content="Neue Rechnung" />
-                    <Label Content="Reservierungs- oder Rechnungsnummer" FontWeight="Bold" />
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <TextBox
-                            Grid.Column="0"
-                            FontWeight="Bold"
-                            Text="{Binding SelectedItem.OrderNumber}" />
-                        <Button
-                            Grid.Column="1"
-                            Command="{Binding SearchEventCommand}"
-                            Content="Suchen" />
-                    </Grid>
-                    <Label Content="Firmenname" FontWeight="Bold" />
-                    <TextBox Text="{Binding SelectedItem.CompanyName}" />
-                    <Label Content="Vor- und Nachname" FontWeight="Bold" />
-                    <TextBox Text="{Binding SelectedItem.FirstAndLastName}" />
-                    <Label Content="Straße und Hausnummer" FontWeight="Bold" />
-                    <TextBox Text="{Binding SelectedItem.StreetAndNumber}" />
-                    <Label Content="PLZ und Ort" FontWeight="Bold" />
-                    <TextBox Text="{Binding SelectedItem.PostalCodeAndCity}" />
-                    <Label Content="Email" FontWeight="Bold" />
-                    <TextBox Text="{Binding SelectedItem.EmailAddress}" />
-                    <Label Content="Beschreibung" FontWeight="Bold" />
-                    <TextBlock Text="{Binding SelectedItem.Description}" TextWrapping="Wrap" />
-                    <Label Content="Rechnungsdatum" FontWeight="Bold" />
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition />
-                        </Grid.ColumnDefinitions>
-                        <DatePicker FirstDayOfWeek="Monday" SelectedDate="{Binding SelectedItem.Date}" />
-                        <Button
-                            Grid.Column="1"
-                            Command="{Binding SetCurrentDateCommand}"
-                            Content="Heute" />
-                    </Grid>
-                    <Button
-                        Grid.Row="4"
-                        Margin="0,10"
-                        HorizontalAlignment="Right"
-                        Command="{Binding AddRowCommand}"
-                        Content="Zeile hinzufügen" />
-                </StackPanel>
-                <DataGrid
-                    Grid.Row="1"
-                    AutoGenerateColumns="False"
-                    CanUserAddRows="False"
-                    ItemsSource="{Binding SelectedItem.InvoiceRows}">
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="CellEditEnding">
-                            <i:InvokeCommandAction Command="{Binding CalculatePriceCommand}" />
-                        </i:EventTrigger>
-                        <i:EventTrigger EventName="SelectionChanged">
-                            <i:InvokeCommandAction Command="{Binding CalculatePriceCommand}" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <DataGrid.Columns>
-                        <DataGridTextColumn
-                            Binding="{Binding Path=Position}"
-                            Header="#"
-                            IsReadOnly="True" />
-                        <DataGridTextColumn Binding="{Binding Path=Quantity}" Header="Anzahl" />
-                        <DataGridTextColumn Binding="{Binding Path=Unit, UpdateSourceTrigger=PropertyChanged}" Header="Einheit" />
-                        <DataGridTemplateColumn Width="*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <ComboBox IsEditable="True" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
-                                        <ComboBoxItem Content="Vereinsheim" />
-                                        <ComboBoxItem Content="Gelände" />
-                                        <ComboBoxItem Content="Vereinsheim und Gelände" />
-                                        <ComboBoxItem Content="Endreinigung" />
-                                    </ComboBox>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Binding="{Binding Path=UnitPrice, UpdateSourceTrigger=PropertyChanged}" Header="Einzelpreis" />
-                        <DataGridTextColumn
-                            Binding="{Binding Path=TotalPrice}"
-                            Header="Gesamtpreis"
-                            IsReadOnly="True" />
-                    </DataGrid.Columns>
-                </DataGrid>
-                <Grid Grid.Row="2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
+            <ScrollViewer Grid.Column="1">
+                <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <Label Content="Gesamtbetrag" FontStyle="Oblique" />
-                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                        <Label Content="{Binding TotalAmount}" FontWeight="Bold" />
-                        <Label Content="€" FontStyle="Oblique" />
+                    <StackPanel Margin="5">
+                        <Button Command="{Binding AddNewInvoiceCommand}" Content="Neue Rechnung" />
+                        <Label Content="Reservierungs- oder Rechnungsnummer" FontWeight="Bold" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <TextBox
+                                Grid.Column="0"
+                                FontWeight="Bold"
+                                Text="{Binding SelectedItem.OrderNumber}" />
+                            <Button
+                                Grid.Column="1"
+                                Command="{Binding SearchEventCommand}"
+                                Content="Suchen" />
+                        </Grid>
+                        <Label Content="Firmenname" FontWeight="Bold" />
+                        <TextBox Text="{Binding SelectedItem.CompanyName}" />
+                        <Label Content="Vor- und Nachname" FontWeight="Bold" />
+                        <TextBox Text="{Binding SelectedItem.FirstAndLastName}" />
+                        <Label Content="Straße und Hausnummer" FontWeight="Bold" />
+                        <TextBox Text="{Binding SelectedItem.StreetAndNumber}" />
+                        <Label Content="PLZ und Ort" FontWeight="Bold" />
+                        <TextBox Text="{Binding SelectedItem.PostalCodeAndCity}" />
+                        <Label Content="Email" FontWeight="Bold" />
+                        <TextBox Text="{Binding SelectedItem.EmailAddress}" />
+                        <Label Content="Beschreibung" FontWeight="Bold" />
+                        <TextBlock Text="{Binding SelectedItem.Description}" TextWrapping="Wrap" />
+                        <Label Content="Rechnungsdatum" FontWeight="Bold" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <DatePicker FirstDayOfWeek="Monday" SelectedDate="{Binding SelectedItem.Date}" />
+                            <Button
+                                Grid.Column="1"
+                                Command="{Binding SetCurrentDateCommand}"
+                                Content="Heute" />
+                        </Grid>
+                        <Button
+                            Grid.Row="4"
+                            Margin="0,10"
+                            HorizontalAlignment="Right"
+                            Command="{Binding AddRowCommand}"
+                            Content="Zeile hinzufügen" />
                     </StackPanel>
-                    <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
-                        <Button Command="{Binding SaveFileCommand}" Content="Speichern" />
-                        <Button Command="{Binding GeneratePdfCommand}" Content="PDF erzeugen" />
-                        <Button Command="{Binding SendMailCommand}" Content="Rechnung via Email senden" />
-                        <Button Command="{Binding InvoicePaidCommand}" Content="Rechnung als bezahlt markieren" />
-                    </StackPanel>
+                    <DataGrid
+                        MinHeight="200"
+                        Grid.Row="1"
+                        AutoGenerateColumns="False"
+                        CanUserAddRows="False"
+                        ItemsSource="{Binding SelectedItem.InvoiceRows}">
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="CellEditEnding">
+                                <i:InvokeCommandAction Command="{Binding CalculatePriceCommand}" />
+                            </i:EventTrigger>
+                            <i:EventTrigger EventName="SelectionChanged">
+                                <i:InvokeCommandAction Command="{Binding CalculatePriceCommand}" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn
+                                Binding="{Binding Path=Position}"
+                                Header="#"
+                                IsReadOnly="True" />
+                            <DataGridTextColumn Binding="{Binding Path=Quantity}" Header="Anzahl" />
+                            <DataGridTextColumn Binding="{Binding Path=Unit, UpdateSourceTrigger=PropertyChanged}" Header="Einheit" />
+                            <DataGridTemplateColumn Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <ComboBox IsEditable="True" Text="{Binding Description, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}">
+                                            <ComboBoxItem Content="Vereinsheim" />
+                                            <ComboBoxItem Content="Gelände" />
+                                            <ComboBoxItem Content="Vereinsheim und Gelände" />
+                                            <ComboBoxItem Content="Endreinigung" />
+                                        </ComboBox>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Binding="{Binding Path=UnitPrice, UpdateSourceTrigger=PropertyChanged}" Header="Einzelpreis" />
+                            <DataGridTextColumn
+                                Binding="{Binding Path=TotalPrice}"
+                                Header="Gesamtpreis"
+                                IsReadOnly="True" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Label Content="Gesamtbetrag" FontStyle="Oblique" />
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Label Content="{Binding TotalAmount}" FontWeight="Bold" />
+                            <Label Content="€" FontStyle="Oblique" />
+                        </StackPanel>
+                        <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
+                            <Button Command="{Binding SaveFileCommand}" Content="Speichern" />
+                            <Button Command="{Binding GeneratePdfCommand}" Content="PDF erzeugen" />
+                            <Button Command="{Binding SendMailCommand}" Content="Rechnung via Email senden" />
+                            <Button Command="{Binding InvoicePaidCommand}" Content="Rechnung als bezahlt markieren" />
+                        </StackPanel>
+                    </Grid>
                 </Grid>
-            </Grid>
+            </ScrollViewer>
         </Grid>
         <GridSplitter
             Grid.Column="1"
