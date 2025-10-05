@@ -136,8 +136,8 @@
                             Content="Zeile hinzufügen" />
                     </StackPanel>
                     <DataGrid
-                        MinHeight="200"
                         Grid.Row="1"
+                        MinHeight="200"
                         AutoGenerateColumns="False"
                         CanUserAddRows="False"
                         ItemsSource="{Binding SelectedItem.InvoiceRows}">
@@ -193,8 +193,16 @@
                         <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
                             <Button Command="{Binding SaveFileCommand}" Content="Speichern" />
                             <Button Command="{Binding GeneratePdfCommand}" Content="PDF erzeugen" />
-                            <Button Command="{Binding SendMailCommand}" Content="Rechnung via Email senden" />
-                            <Button Command="{Binding InvoicePaidCommand}" Content="Rechnung als bezahlt markieren" />
+                            <Button
+                                Command="{Binding SendMailCommand}"
+                                Content="Rechnung via Email senden"
+                                ToolTip="Senden ist erst nach PDF-Erstellung und Eingabe der Email möglich."
+                                ToolTipService.ShowOnDisabled="True" />
+                            <Button
+                                Command="{Binding InvoicePaidCommand}"
+                                Content="Rechnung als bezahlt markieren"
+                                ToolTip="Markieren ist erst nach Versand der Email möglich."
+                                ToolTipService.ShowOnDisabled="True" />
                         </StackPanel>
                     </Grid>
                 </Grid>

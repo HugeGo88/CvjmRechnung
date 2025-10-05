@@ -438,6 +438,7 @@ namespace CvjmRechnung.ViewModel
                 SelectedItem.PostalCodeAndCity = ((EventDetails)selectedItem).City;
                 SelectedItem.EmailAddress = ((EventDetails)selectedItem).Email;
                 SelectedItem.Description = ((EventDetails)selectedItem).Description;
+                SelectedItem.Date = ((EventDetails)selectedItem).EndDate;
             }
             else if (dialogResult == false)
             {
