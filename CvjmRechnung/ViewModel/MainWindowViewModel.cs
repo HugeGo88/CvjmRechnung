@@ -37,6 +37,8 @@ namespace CvjmRechnung.ViewModel
         [ObservableProperty]
         [NotifyCanExecuteChangedFor(nameof(SaveFileCommand))]
         [NotifyCanExecuteChangedFor(nameof(GeneratePdfCommand))]
+        [NotifyCanExecuteChangedFor(nameof(SendMailCommand))]
+        [NotifyCanExecuteChangedFor(nameof(InvoicePaidCommand))]
         Invoice selectedItem = new Invoice();
 
         [ObservableProperty]
@@ -113,25 +115,35 @@ namespace CvjmRechnung.ViewModel
             File.WriteAllText($"{templatePathHtml}", content);
 
             string pathToExe = GetPathForExe("msedge.exe");
-            ProcessStartInfo ps = new ProcessStartInfo()
+            string userDataDir = Path.Combine(Path.GetTempPath(), "edge-headless-user-data");
+            Directory.CreateDirectory(userDataDir);
+
+            ProcessStartInfo ps = new ProcessStartInfo
             {
                 FileName = pathToExe,
-                Arguments = $"--headless --disable-gpu --print-to-pdf-no-header --run-all-compositor-stages-before-draw --virtual-time-budget=5000 --print-to-pdf=\"{SelectedItem.PdfPath}\" \"{templatePathHtml}\"",
+                Arguments = $"--headless --disable-gpu --user-data-dir=\"{userDataDir}\" --print-to-pdf-no-header --run-all-compositor-stages-before-draw --virtual-time-budget=5000 --print-to-pdf=\"{SelectedItem.PdfPath}\" \"{templatePathHtml}\"",
                 CreateNoWindow = true,
-                UseShellExecute = false
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
             };
-            Process converter = Process.Start(ps);
-            if (!converter.WaitForExit(5000))
+
+            using Process converter = Process.Start(ps);
+            converter.WaitForExit(); // Wait for process to finish
+
+            int exitCode = converter.ExitCode;
+            string output = converter.StandardOutput.ReadToEnd();
+            string error = converter.StandardError.ReadToEnd();
+
+            if (exitCode != 0)
             {
-                converter.Kill();
-            }
-            if (converter.ExitCode != 0)
-            {
-                Console.WriteLine("An error occured!");
+                // Log or display error details
+                _logger.Error($"Process failed with exit code {exitCode}. Error: {error}");
+                MessageBox.Show($"PDF creation failed. Exit code: {exitCode}\nError: {error}", "PDF Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
             else
             {
-                SelectedItem.State = InvoiceState.PDF_CREATED;
+                // Success
                 PdfPath = SelectedItem.PdfPath;
             }
         }
@@ -307,19 +319,20 @@ namespace CvjmRechnung.ViewModel
             SelectedItem.Date = DateTime.Now;
         }
 
-        [RelayCommand(CanExecute = nameof(SaveFileAndGenerateMailExcutable))]
+        [RelayCommand(CanExecute = nameof(SaveFileExcutable))]
         void SaveFile()
         {
             _logger.Info("Save file button pressed");
             SelectedItem.SaveToXml();
         }
 
-        private bool SaveFileAndGenerateMailExcutable()
+        private bool SaveFileExcutable()
         {
+            if (SelectedItem is null) return false;
             return SelectedItem.InvoiceFolder is not null;
         }
 
-        [RelayCommand(CanExecute = nameof(SaveFileAndGenerateMailExcutable))]
+        [RelayCommand(CanExecute = nameof(GeneratePdfExcutable))]
         void GeneratePdf()
         {
             Mouse.OverrideCursor = Cursors.Wait;
@@ -328,45 +341,18 @@ namespace CvjmRechnung.ViewModel
             PdfPath = _emptyPdf;
             string content = GetHtmlCodeForInvoice();
             RenderPdf(content);
+            SelectedItem.State = InvoiceState.PDF_CREATED;
             SaveFile();
             Mouse.OverrideCursor = null;
         }
 
-        [RelayCommand]
-        void AddNewInvoice()
+        private bool GeneratePdfExcutable()
         {
-            var selectionWindow = new InvoicesView();
-            bool? dialogResult = selectionWindow.ShowDialog();
-
-            _logger.Info("Add new invoice button pressed");
-            if (Invoices is null) { return; }
-            Invoices.Add(new Invoice(InvoiceFolder));
-            OnPropertyChanged(nameof(Invoices));
-            SelectedItem = Invoices.Last();
-
-            if (dialogResult == true)
-            {
-                object selectedItem = selectionWindow.SelectedEventItem;
-                _logger.Info($"Selected item retrieved: {selectedItem.ToString()}");
-                SelectedItem.OrderNumber = ((EventDetails)selectedItem).EventId;
-                SelectedItem.CompanyName = ((EventDetails)selectedItem).EventName;
-                SelectedItem.FirstAndLastName = ((EventDetails)selectedItem).Name;
-                SelectedItem.StreetAndNumber = ((EventDetails)selectedItem).Street;
-                SelectedItem.PostalCodeAndCity = ((EventDetails)selectedItem).City;
-                SelectedItem.EmailAddress = ((EventDetails)selectedItem).Email;
-                SelectedItem.Description = ((EventDetails)selectedItem).Description;
-            }
-            else if (dialogResult == false)
-            {
-                _logger.Info("Selection was cancelled.");
-            }
-            else // dialogResult == null
-            {
-                _logger.Info("Dialog was closed without a definitive result.");
-            }
+            if (SelectedItem is null) return false;
+            return SelectedItem.InvoiceFolder is not null;
         }
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(SendMailExcutable))]
         void SendMail()
         {
             _logger.Info("Send mail button pressed");
@@ -409,12 +395,58 @@ namespace CvjmRechnung.ViewModel
             MessageBox.Show("Email wurde erfolgreich gesendet", "Email gesendet", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
-        [RelayCommand]
+        private bool SendMailExcutable()
+        {
+            if (SelectedItem is null) return false;
+            return SelectedItem.InvoiceFolder is not null && SelectedItem.State == InvoiceState.PDF_CREATED && !string.IsNullOrWhiteSpace(SelectedItem.EmailAddress);
+        }
+
+        [RelayCommand(CanExecute = nameof(InvoicePaidExcutable))]
         void InvoicePaid()
         {
             _logger.Info("Invoice paid button pressed");
             SelectedItem.State = InvoiceState.INVOICE_PAID;
             SaveFile();
+        }
+
+        private bool InvoicePaidExcutable()
+        {
+            if (SelectedItem is null) return false;
+            return SelectedItem.InvoiceFolder is not null && SelectedItem.State > InvoiceState.PDF_CREATED;
+        }
+
+        [RelayCommand]
+        void AddNewInvoice()
+        {
+            var selectionWindow = new InvoicesView();
+            bool? dialogResult = selectionWindow.ShowDialog();
+
+            _logger.Info("Add new invoice button pressed");
+            if (Invoices is null) { return; }
+            Invoices.Add(new Invoice(InvoiceFolder));
+            OnPropertyChanged(nameof(Invoices));
+            SelectedItem = Invoices.Last();
+
+            if (dialogResult == true)
+            {
+                object selectedItem = selectionWindow.SelectedEventItem;
+                _logger.Info($"Selected item retrieved: {selectedItem.ToString()}");
+                SelectedItem.OrderNumber = ((EventDetails)selectedItem).EventId;
+                SelectedItem.CompanyName = ((EventDetails)selectedItem).EventName;
+                SelectedItem.FirstAndLastName = ((EventDetails)selectedItem).Name;
+                SelectedItem.StreetAndNumber = ((EventDetails)selectedItem).Street;
+                SelectedItem.PostalCodeAndCity = ((EventDetails)selectedItem).City;
+                SelectedItem.EmailAddress = ((EventDetails)selectedItem).Email;
+                SelectedItem.Description = ((EventDetails)selectedItem).Description;
+            }
+            else if (dialogResult == false)
+            {
+                _logger.Info("Selection was cancelled.");
+            }
+            else // dialogResult == null
+            {
+                _logger.Info("Dialog was closed without a definitive result.");
+            }
         }
 
         [RelayCommand]

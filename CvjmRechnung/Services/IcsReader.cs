@@ -36,13 +36,13 @@ public class IcsReader
                 }
             }
         }
-        catch (HttpRequestException e)
+        catch (HttpRequestException ex)
         {
-            Console.WriteLine($"Error downloading calendar from URL: {e.Message}");
+            _logger.Error(ex, "Error downloading calendar from URL: {ex.Message}", ex.Message);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Console.WriteLine($"Error processing ICS data: {e.Message}");
+            _logger.Error(ex, "Error processing ICS data: {ex.Message}", ex.Message);
         }
 
         return events;

@@ -32,7 +32,7 @@ namespace CvjmRechnung.Model
             InvoiceRows.CollectionChanged += InvoiceRows_CollectionChanged;
         }
 
-        public string InvoiceFolder { get; set; } = "";
+        public string InvoiceFolder { get; set; }
 
         public string PdfPath { get => @$"{InvoiceFolder}\{InvoiceId}.pdf"; }
 
