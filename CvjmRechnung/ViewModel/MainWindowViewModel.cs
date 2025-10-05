@@ -20,7 +20,7 @@ namespace CvjmRechnung.ViewModel
 {
     partial class MainWindowViewModel : ObservableObject
     {
-        #region fields
+        #region Fields
 
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         private string _emptyPdf = $"{Directory.GetCurrentDirectory()}\\Resources\\empty.pdf";
@@ -55,7 +55,7 @@ namespace CvjmRechnung.ViewModel
 
         #endregion
 
-        #region constructor
+        #region Constructor
         //public MainWindowViewModel(IMailClient mailClient)
         public MainWindowViewModel(IMailClient mailClientService, IConfiguration configuration)
         {
@@ -71,7 +71,7 @@ namespace CvjmRechnung.ViewModel
 
         #endregion
 
-        #region methods
+        #region Methods
         private void LoadInvoiceFolder()
         {
             var invoiceFiles = Directory.GetFiles(InvoiceFolder, "*.xml");
@@ -112,7 +112,7 @@ namespace CvjmRechnung.ViewModel
             }
             File.WriteAllText($"{templatePathHtml}", content);
 
-            string pathToExe = getPathForExe("msedge.exe");
+            string pathToExe = GetPathForExe("msedge.exe");
             ProcessStartInfo ps = new ProcessStartInfo()
             {
                 FileName = pathToExe,
@@ -136,7 +136,7 @@ namespace CvjmRechnung.ViewModel
             }
         }
 
-        private string getPathForExe(string fileName)
+        private string GetPathForExe(string fileName)
         {
             string keyBase = @"SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths";
             RegistryKey localMachine = Registry.LocalMachine;
@@ -284,7 +284,7 @@ namespace CvjmRechnung.ViewModel
 
         #endregion
 
-        #region commands
+        #region Commands
 
         [RelayCommand]
         void AddRow()
@@ -333,7 +333,7 @@ namespace CvjmRechnung.ViewModel
         }
 
         [RelayCommand]
-        async Task AddNewInvoice()
+        void AddNewInvoice()
         {
             var selectionWindow = new InvoicesView();
             bool? dialogResult = selectionWindow.ShowDialog();
@@ -399,11 +399,13 @@ namespace CvjmRechnung.ViewModel
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, "Email could not be sent");
                 MessageBox.Show("Email konnte nicht gesendet werden", "Email nicht gesendet", MessageBoxButton.OK, MessageBoxImage.Error);
                 return;
             }
 
             SelectedItem.State = InvoiceState.EMAIL_SEND;
+            SaveFile();
             MessageBox.Show("Email wurde erfolgreich gesendet", "Email gesendet", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
@@ -412,6 +414,7 @@ namespace CvjmRechnung.ViewModel
         {
             _logger.Info("Invoice paid button pressed");
             SelectedItem.State = InvoiceState.INVOICE_PAID;
+            SaveFile();
         }
 
         [RelayCommand]
@@ -494,8 +497,6 @@ namespace CvjmRechnung.ViewModel
                 e.Handled = true;
             }
         }
-
         #endregion
-
     }
 }

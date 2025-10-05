@@ -5,14 +5,13 @@
     {
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
-
-        public string EventName { get; set; }
-        public string Name { get; set; }
-        public string Street { get; set; }
-        public string City { get; set; }
-        public string EventId { get; set; }
-        public string Email { get; set; }
-        public string Description { get; set; }
+        public string EventName { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Street { get; set; } = "";
+        public string City { get; set; } = "";
+        public string EventId { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string Description { get; set; } = "";
         public DateTime StartDate { get; set; }
         public string StartDateString { get => StartDate.ToString("dd.MM.yyyy"); }
         public DateTime EndDate { get; set; }
