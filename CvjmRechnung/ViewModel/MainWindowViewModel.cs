@@ -398,7 +398,8 @@ namespace CvjmRechnung.ViewModel
         private bool SendMailExcutable()
         {
             if (SelectedItem is null) return false;
-            return SelectedItem.InvoiceFolder is not null && SelectedItem.State == InvoiceState.PDF_CREATED && !string.IsNullOrWhiteSpace(SelectedItem.EmailAddress);
+            return true;
+            //return SelectedItem.InvoiceFolder is not null && SelectedItem.State == InvoiceState.PDF_CREATED && !string.IsNullOrWhiteSpace(SelectedItem.EmailAddress);
         }
 
         [RelayCommand(CanExecute = nameof(InvoicePaidExcutable))]
