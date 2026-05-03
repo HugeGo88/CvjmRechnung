@@ -30,55 +30,61 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <ListView
-                    Grid.Row="1"
-                    Grid.Column="0"
-                    ItemsSource="{Binding Invoices}"
-                    SelectedItem="{Binding SelectedItem}">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding State}" Value="SAVED">
-                                    <Setter Property="Background" Value="LightBlue" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding State}" Value="PDF_CREATED">
-                                    <Setter Property="Background" Value="LightYellow" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding State}" Value="EMAIL_SEND">
-                                    <Setter Property="Background" Value="LightCoral" />
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding State}" Value="INVOICE_PAID">
-                                    <Setter Property="Background" Value="LightGreen" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                    <i:Interaction.Triggers>
-                        <i:EventTrigger EventName="KeyUp">
-                            <i:InvokeCommandAction Command="{Binding DeleteSelectedInvoiceCommand}" PassEventArgsToCommand="True" />
-                        </i:EventTrigger>
-                    </i:Interaction.Triggers>
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <WrapPanel>
-                                    <TextBlock Text="Datum: " />
-                                    <TextBlock FontWeight="Bold" Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy}'}" />
-                                    <TextBlock Text=" Rechnung: " />
-                                    <TextBlock FontWeight="Bold" Text="{Binding OrderNumber}" />
-                                </WrapPanel>
-                                <WrapPanel>
-                                    <TextBlock Text="Name: " />
-                                    <TextBlock FontWeight="Bold" Text="{Binding FirstAndLastName}" />
-                                </WrapPanel>
-                                <WrapPanel>
-                                    <TextBlock Text="Status: " />
-                                    <TextBlock FontWeight="Bold" Text="{Binding State}" />
-                                </WrapPanel>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                <StackPanel Grid.Row="1">
+                    <Button
+                        Margin="8,0,0,0"
+                        Command="{Binding OpenSettingsCommand}"
+                        Content="Einstellungen" />
+                    <ListView
+                        Grid.Row="1"
+                        Grid.Column="0"
+                        ItemsSource="{Binding Invoices}"
+                        SelectedItem="{Binding SelectedItem}">
+                        <ListView.ItemContainerStyle>
+                            <Style TargetType="ListViewItem">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding State}" Value="SAVED">
+                                        <Setter Property="Background" Value="LightBlue" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding State}" Value="PDF_CREATED">
+                                        <Setter Property="Background" Value="LightYellow" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding State}" Value="EMAIL_SEND">
+                                        <Setter Property="Background" Value="LightCoral" />
+                                    </DataTrigger>
+                                    <DataTrigger Binding="{Binding State}" Value="INVOICE_PAID">
+                                        <Setter Property="Background" Value="LightGreen" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListView.ItemContainerStyle>
+                        <i:Interaction.Triggers>
+                            <i:EventTrigger EventName="KeyUp">
+                                <i:InvokeCommandAction Command="{Binding DeleteSelectedInvoiceCommand}" PassEventArgsToCommand="True" />
+                            </i:EventTrigger>
+                        </i:Interaction.Triggers>
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <WrapPanel>
+                                        <TextBlock Text="Datum: " />
+                                        <TextBlock FontWeight="Bold" Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy}'}" />
+                                        <TextBlock Text=" Rechnung: " />
+                                        <TextBlock FontWeight="Bold" Text="{Binding OrderNumber}" />
+                                    </WrapPanel>
+                                    <WrapPanel>
+                                        <TextBlock Text="Name: " />
+                                        <TextBlock FontWeight="Bold" Text="{Binding FirstAndLastName}" />
+                                    </WrapPanel>
+                                    <WrapPanel>
+                                        <TextBlock Text="Status: " />
+                                        <TextBlock FontWeight="Bold" Text="{Binding State}" />
+                                    </WrapPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </StackPanel>
             </Grid>
             <ScrollViewer Grid.Column="1">
                 <Grid>
@@ -214,14 +220,6 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Stretch"
             ShowsPreview="False" />
-        <StackPanel Grid.Column="2">
-            <Button
-                Margin="8,0,0,0"
-                Command="{Binding OpenSettingsCommand}"
-                Content="Einstellungen" />
-            <wpf:WebView2
-                Grid.Column="2"
-                Source="{Binding SelectedItem.PdfPath}" />
-        </StackPanel>
+        <wpf:WebView2 Grid.Column="2" Source="{Binding SelectedItem.PdfPath}" />
     </Grid>
 </Window>
