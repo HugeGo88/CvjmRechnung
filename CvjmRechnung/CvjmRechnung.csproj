@@ -8,8 +8,8 @@
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Untitled.ico</ApplicationIcon>
 
-	  <PublishSingleFile>true</PublishSingleFile>
-	  <SelfContained>true</SelfContained>
+	  <!--<PublishSingleFile>true</PublishSingleFile>-->
+	  <!--<SelfContained>true</SelfContained>-->
 	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>

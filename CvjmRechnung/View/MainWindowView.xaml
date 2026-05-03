@@ -219,7 +219,9 @@
                 Margin="8,0,0,0"
                 Command="{Binding OpenSettingsCommand}"
                 Content="Einstellungen" />
-            <wpf:WebView2 Grid.Column="2" Source="{Binding PdfPath}" />
+            <wpf:WebView2
+                Grid.Column="2"
+                Source="{Binding SelectedItem.PdfPath}" />
         </StackPanel>
     </Grid>
 </Window>
