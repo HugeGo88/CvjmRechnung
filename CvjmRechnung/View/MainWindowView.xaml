@@ -65,22 +65,35 @@
                         </i:Interaction.Triggers>
                         <ListView.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel>
-                                    <WrapPanel>
-                                        <TextBlock Text="Datum: " />
-                                        <TextBlock FontWeight="Bold" Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy}'}" />
-                                        <TextBlock Text=" Rechnung: " />
-                                        <TextBlock FontWeight="Bold" Text="{Binding OrderNumber}" />
-                                    </WrapPanel>
-                                    <WrapPanel>
-                                        <TextBlock Text="Name: " />
-                                        <TextBlock FontWeight="Bold" Text="{Binding FirstAndLastName}" />
-                                    </WrapPanel>
-                                    <WrapPanel>
-                                        <TextBlock Text="Status: " />
-                                        <TextBlock FontWeight="Bold" Text="{Binding State}" />
-                                    </WrapPanel>
-                                </StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <WrapPanel>
+                                            <TextBlock Text="Datum: " />
+                                            <TextBlock FontWeight="Bold" Text="{Binding Date, StringFormat='{}{0:dd.MM.yyyy}'}" />
+                                            <TextBlock Text=" Rechnung: " />
+                                            <TextBlock FontWeight="Bold" Text="{Binding OrderNumber}" />
+                                        </WrapPanel>
+                                        <WrapPanel>
+                                            <TextBlock Text="Name: " />
+                                            <TextBlock FontWeight="Bold" Text="{Binding FirstAndLastName}" />
+                                        </WrapPanel>
+                                        <WrapPanel>
+                                            <TextBlock Text="Status: " />
+                                            <TextBlock FontWeight="Bold" Text="{Binding State}" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                    <TextBlock
+                                        Grid.Column="1"
+                                        Margin="8,0,0,0"
+                                        HorizontalAlignment="Right"
+                                        VerticalAlignment="Top"
+                                        FontWeight="Bold"
+                                        Text="{Binding TotalAmount, StringFormat={}{0:N2} €}" />
+                                </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
