@@ -2,8 +2,10 @@
 {
     public interface IConfiguration
     {
-        public string Password { get; }
+        string Password { get; set; }
+
         void Load();
+
         void Save();
     }
 }

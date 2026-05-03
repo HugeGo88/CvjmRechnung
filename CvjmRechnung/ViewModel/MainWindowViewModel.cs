@@ -29,7 +29,16 @@ namespace CvjmRechnung.ViewModel
 
         #region Properties
 
-        public string InvoiceFolder { get => Path.Combine(Path.Combine(Directory.GetParent(Environment.CurrentDirectory).ToString(), "Rechnungen")); }
+        public string InvoiceFolder
+        {
+            get
+            {
+                string parentDirectory = Directory.GetParent(Environment.CurrentDirectory)?.FullName
+                    ?? Environment.CurrentDirectory;
+
+                return Path.Combine(parentDirectory, "Rechnungen");
+            }
+        }
 
         [ObservableProperty]
         ObservableCollection<Invoice> invoices = new();
@@ -112,9 +121,16 @@ namespace CvjmRechnung.ViewModel
             {
                 Directory.CreateDirectory(InvoiceFolder);
             }
-            File.WriteAllText($"{templatePathHtml}", content);
+            File.WriteAllText(templatePathHtml, content);
 
-            string pathToExe = GetPathForExe("msedge.exe");
+            string? pathToExe = GetPathForExe("msedge.exe");
+            if (string.IsNullOrWhiteSpace(pathToExe))
+            {
+                _logger.Error("msedge.exe path could not be resolved.");
+                MessageBox.Show("Microsoft Edge wurde nicht gefunden. PDF konnte nicht erstellt werden.", "PDF Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             string userDataDir = Path.Combine(Path.GetTempPath(), "edge-headless-user-data");
             Directory.CreateDirectory(userDataDir);
 
@@ -128,7 +144,14 @@ namespace CvjmRechnung.ViewModel
                 RedirectStandardError = true
             };
 
-            using Process converter = Process.Start(ps);
+            using Process? converter = Process.Start(ps);
+            if (converter is null)
+            {
+                _logger.Error("PDF converter process could not be started.");
+                MessageBox.Show("PDF creation failed. Converter process could not be started.", "PDF Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             converter.WaitForExit(); // Wait for process to finish
 
             int exitCode = converter.ExitCode;
@@ -273,8 +296,12 @@ namespace CvjmRechnung.ViewModel
             string qrHtml = CreateQrCodeImgTag(qrCodeContent); // Or any string you want
             var qrDoc = new XmlDocument();
             qrDoc.LoadXml(qrHtml);
-            var qrImgNode = xmlDoc.ImportNode(qrDoc.DocumentElement, true);
-            rootDiv.AppendChild(qrImgNode);
+
+            if (qrDoc.DocumentElement is not null)
+            {
+                var qrImgNode = xmlDoc.ImportNode(qrDoc.DocumentElement, true);
+                rootDiv.AppendChild(qrImgNode);
+            }
 
             // Return HTML string
             return xmlDoc.OuterXml;
@@ -430,16 +457,24 @@ namespace CvjmRechnung.ViewModel
 
             if (dialogResult == true)
             {
-                object selectedItem = selectionWindow.SelectedEventItem;
-                _logger.Info($"Selected item retrieved: {selectedItem.ToString()}");
-                SelectedItem.OrderNumber = ((EventDetails)selectedItem).EventId;
-                SelectedItem.CompanyName = ((EventDetails)selectedItem).EventName;
-                SelectedItem.FirstAndLastName = ((EventDetails)selectedItem).Name;
-                SelectedItem.StreetAndNumber = ((EventDetails)selectedItem).Street;
-                SelectedItem.PostalCodeAndCity = ((EventDetails)selectedItem).City;
-                SelectedItem.EmailAddress = ((EventDetails)selectedItem).Email;
-                SelectedItem.Description = ((EventDetails)selectedItem).Description;
-                SelectedItem.Date = ((EventDetails)selectedItem).EndDate;
+                var selectedEventItem = selectionWindow.SelectedEventItem;
+
+                if (selectedEventItem is EventDetails eventDetails)
+                {
+                    _logger.Info($"Selected item retrieved: {eventDetails}");
+                    SelectedItem.OrderNumber = eventDetails.EventId;
+                    SelectedItem.CompanyName = eventDetails.EventName;
+                    SelectedItem.FirstAndLastName = eventDetails.Name;
+                    SelectedItem.StreetAndNumber = eventDetails.Street;
+                    SelectedItem.PostalCodeAndCity = eventDetails.City;
+                    SelectedItem.EmailAddress = eventDetails.Email;
+                    SelectedItem.Description = eventDetails.Description;
+                    SelectedItem.Date = eventDetails.EndDate;
+                }
+                else
+                {
+                    _logger.Warn("Dialog returned true, but no valid selection was available.");
+                }
             }
             else if (dialogResult == false)
             {
@@ -530,6 +565,17 @@ namespace CvjmRechnung.ViewModel
                     SelectedItem = new Invoice(InvoiceFolder);
                 e.Handled = true;
             }
+        }
+
+        [RelayCommand]
+        void OpenSettings()
+        {
+            var window = new SettingsWindow(iConfiguration)
+            {
+                Owner = Application.Current.MainWindow
+            };
+
+            window.ShowDialog();
         }
         #endregion
     }

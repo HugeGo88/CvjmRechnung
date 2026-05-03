@@ -214,6 +214,12 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Stretch"
             ShowsPreview="False" />
-        <wpf:WebView2 Grid.Column="2" Source="{Binding PdfPath}" />
+        <StackPanel Grid.Column="2">
+            <Button
+                Margin="8,0,0,0"
+                Command="{Binding OpenSettingsCommand}"
+                Content="Einstellungen" />
+            <wpf:WebView2 Grid.Column="2" Source="{Binding PdfPath}" />
+        </StackPanel>
     </Grid>
 </Window>

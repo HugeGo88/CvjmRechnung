@@ -11,10 +11,19 @@ namespace CvjmRechnung.Services
 
     public class ConfigurationService : Interfaces.IConfiguration
     {
-        private readonly string ConfigFileName = Directory.GetCurrentDirectory() + "\\config.xml";
-        private ConfigurationData _data = new ConfigurationData();
+        private readonly string ConfigFileName = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "CvjmRechnung",
+            "config.xml"
+        );
 
-        public string Password { get => _data.Password; }
+        private ConfigurationData _data = new();
+
+        public string Password
+        {
+            get => _data.Password;
+            set => _data.Password = value ?? "";
+        }
 
         public void Load()
         {
@@ -24,14 +33,16 @@ namespace CvjmRechnung.Services
                 return;
             }
 
-
             using var stream = File.OpenRead(ConfigFileName);
             var serializer = new XmlSerializer(typeof(ConfigurationData));
-            _data = (ConfigurationData)serializer.Deserialize(stream);
+            _data = (ConfigurationData)serializer.Deserialize(stream)!;
         }
 
         public void Save()
         {
+            var directory = Path.GetDirectoryName(ConfigFileName)!;
+            Directory.CreateDirectory(directory);
+
             using var stream = File.Create(ConfigFileName);
             var serializer = new XmlSerializer(typeof(ConfigurationData));
             serializer.Serialize(stream, _data);
