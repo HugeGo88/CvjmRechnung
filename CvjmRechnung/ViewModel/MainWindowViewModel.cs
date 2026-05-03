@@ -29,16 +29,8 @@ namespace CvjmRechnung.ViewModel
 
         #region Properties
 
-        public string InvoiceFolder
-        {
-            get
-            {
-                string parentDirectory = Directory.GetParent(Environment.CurrentDirectory)?.FullName
-                    ?? Environment.CurrentDirectory;
-
-                return Path.Combine(parentDirectory, "Rechnungen");
-            }
-        }
+        [ObservableProperty]
+        string invoiceFolder = "";
 
         [ObservableProperty]
         ObservableCollection<Invoice> invoices = new();
@@ -74,21 +66,47 @@ namespace CvjmRechnung.ViewModel
         //public MainWindowViewModel(IMailClient mailClient)
         public MainWindowViewModel(IMailClient mailClientService, IConfiguration configuration)
         {
-            if (!Path.Exists(InvoiceFolder))
-            {
-                Directory.CreateDirectory(InvoiceFolder);
-            }
-            LoadInvoiceFolder();
             iMailClientService = mailClientService;
             iConfiguration = configuration;
             iConfiguration.Load();
+
+            SetInvoiceFolderFromConfiguration();
+            LoadInvoiceFolder();
         }
 
         #endregion
 
         #region Methods
+
+        private static string GetDefaultInvoiceFolder()
+        {
+            string parentDirectory = Directory.GetParent(Environment.CurrentDirectory)?.FullName
+                ?? Environment.CurrentDirectory;
+
+            return Path.Combine(parentDirectory, "Rechnungen");
+        }
+
+        private void SetInvoiceFolderFromConfiguration()
+        {
+            InvoiceFolder = string.IsNullOrWhiteSpace(iConfiguration.InvoicePath)
+                ? GetDefaultInvoiceFolder()
+                : iConfiguration.InvoicePath;
+
+            iConfiguration.InvoicePath = InvoiceFolder;
+
+            if (!Path.Exists(InvoiceFolder))
+            {
+                Directory.CreateDirectory(InvoiceFolder);
+            }
+        }
+
         private void LoadInvoiceFolder()
         {
+            if (!Path.Exists(InvoiceFolder))
+            {
+                Directory.CreateDirectory(InvoiceFolder);
+            }
+
             var invoiceFiles = Directory.GetFiles(InvoiceFolder, "*.xml");
             var serializer = new XmlSerializer(typeof(Invoice));
             Invoices.Clear();
@@ -581,12 +599,24 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void OpenSettings()
         {
+            var previousInvoiceFolder = InvoiceFolder;
             var window = new SettingsWindow(iConfiguration)
             {
                 Owner = Application.Current.MainWindow
             };
 
-            window.ShowDialog();
+            var dialogResult = window.ShowDialog();
+
+            if (dialogResult == true)
+            {
+                SetInvoiceFolderFromConfiguration();
+
+                if (!string.Equals(previousInvoiceFolder, InvoiceFolder, StringComparison.OrdinalIgnoreCase))
+                {
+                    LoadInvoiceFolder();
+                    SelectedItem = Invoices.LastOrDefault() ?? new Invoice(InvoiceFolder);
+                }
+            }
         }
         #endregion
     }

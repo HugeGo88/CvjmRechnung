@@ -2,12 +2,14 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Einstellungen"
-        Height="180"
-        Width="420"
+        Height="240"
+        Width="520"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner">
     <Grid Margin="16">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -17,7 +19,10 @@
         <TextBlock Grid.Row="0" Text="E-Mail Passwort" Margin="0,0,0,6" />
         <PasswordBox Grid.Row="1" x:Name="PasswordBox" />
 
-        <StackPanel Grid.Row="3"
+        <TextBlock Grid.Row="2" Text="Rechnungsordner" Margin="0,12,0,6" />
+        <TextBox Grid.Row="3" x:Name="InvoicePathTextBox" />
+
+        <StackPanel Grid.Row="5"
                     Orientation="Horizontal"
                     HorizontalAlignment="Right"
                     Margin="0,16,0,0">
