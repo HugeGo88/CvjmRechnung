@@ -61,6 +61,10 @@ namespace CvjmRechnung.ViewModel
             return x.TotalPrice;
         });
 
+        public double CurrentYearTotalAmount => Invoices
+            .Where(x => x.Date?.Year == DateTime.Now.Year)
+            .Sum(x => x.InvoiceRows.Sum(row => row.TotalPrice));
+
         private readonly IMailClient iMailClientService;
         private readonly IConfiguration iConfiguration;
 
@@ -99,6 +103,7 @@ namespace CvjmRechnung.ViewModel
                 }
             }
             Invoices = new ObservableCollection<Invoice>(Invoices.OrderBy(x => x.Date).Reverse().ToList());
+            OnPropertyChanged(nameof(CurrentYearTotalAmount));
         }
 
         partial void OnSelectedItemChanged(Invoice value)
@@ -331,12 +336,14 @@ namespace CvjmRechnung.ViewModel
             _logger.Info("Add new row button pressed");
             SelectedItem.InvoiceRows.Add(new InvoiceRow() { Position = SelectedItem.InvoiceRows.Count + 1 });
             OnPropertyChanged(nameof(TotalAmount));
+            OnPropertyChanged(nameof(CurrentYearTotalAmount));
         }
 
         [RelayCommand]
         void CalculatePrice()
         {
             OnPropertyChanged(nameof(TotalAmount));
+            OnPropertyChanged(nameof(CurrentYearTotalAmount));
         }
 
         [RelayCommand]
@@ -344,6 +351,7 @@ namespace CvjmRechnung.ViewModel
         {
             _logger.Info("Set current date button pressed");
             SelectedItem.Date = DateTime.Now;
+            OnPropertyChanged(nameof(CurrentYearTotalAmount));
         }
 
         [RelayCommand(CanExecute = nameof(SaveFileExcutable))]
@@ -453,6 +461,7 @@ namespace CvjmRechnung.ViewModel
             if (Invoices is null) { return; }
             Invoices.Add(new Invoice(InvoiceFolder));
             OnPropertyChanged(nameof(Invoices));
+            OnPropertyChanged(nameof(CurrentYearTotalAmount));
             SelectedItem = Invoices.Last();
 
             if (dialogResult == true)
@@ -470,6 +479,7 @@ namespace CvjmRechnung.ViewModel
                     SelectedItem.EmailAddress = eventDetails.Email;
                     SelectedItem.Description = eventDetails.Description;
                     SelectedItem.Date = eventDetails.EndDate;
+                    OnPropertyChanged(nameof(CurrentYearTotalAmount));
                 }
                 else
                 {
@@ -563,6 +573,7 @@ namespace CvjmRechnung.ViewModel
                     SelectedItem = Invoices.Last();
                 else
                     SelectedItem = new Invoice(InvoiceFolder);
+                OnPropertyChanged(nameof(CurrentYearTotalAmount));
                 e.Handled = true;
             }
         }

@@ -84,6 +84,11 @@
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
+                    <StackPanel Margin="8,8,0,0" Orientation="Horizontal">
+                        <Label Content="Summe aktuelles Jahr:" FontWeight="Bold" />
+                        <Label Content="{Binding CurrentYearTotalAmount}" FontWeight="Bold" />
+                        <Label Content="€" FontStyle="Oblique" />
+                    </StackPanel>
                 </StackPanel>
             </Grid>
             <ScrollViewer Grid.Column="1">
