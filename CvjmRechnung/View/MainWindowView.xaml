@@ -30,16 +30,26 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <StackPanel Grid.Row="1">
+                <Grid Grid.Row="1" Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
                     <Button
                         Margin="8,0,0,0"
                         Command="{Binding OpenSettingsCommand}"
                         Content="Einstellungen" />
+                    <StackPanel Margin="8,8,0,0" Orientation="Horizontal" Grid.Row="1">
+                        <Label Content="Summe aktuelles Jahr:" FontWeight="Bold" />
+                        <Label Content="{Binding CurrentYearTotalAmount}" FontWeight="Bold" />
+                        <Label Content="€" FontStyle="Oblique" />
+                    </StackPanel>
                     <ListView
-                        Grid.Row="1"
-                        Grid.Column="0"
-                        ItemsSource="{Binding Invoices}"
-                        SelectedItem="{Binding SelectedItem}">
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            ItemsSource="{Binding Invoices}"
+                            SelectedItem="{Binding SelectedItem}">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem">
                                 <Style.Triggers>
@@ -87,22 +97,17 @@
                                         </WrapPanel>
                                     </StackPanel>
                                     <TextBlock
-                                        Grid.Column="1"
-                                        Margin="8,0,0,0"
-                                        HorizontalAlignment="Right"
-                                        VerticalAlignment="Top"
-                                        FontWeight="Bold"
-                                        Text="{Binding TotalAmount, StringFormat={}{0:N2} €}" />
+                                            Grid.Column="1"
+                                            Margin="8,0,0,0"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Top"
+                                            FontWeight="Bold"
+                                            Text="{Binding TotalAmount, StringFormat={}{0:N2} €}" />
                                 </Grid>
                             </DataTemplate>
                         </ListView.ItemTemplate>
                     </ListView>
-                    <StackPanel Margin="8,8,0,0" Orientation="Horizontal">
-                        <Label Content="Summe aktuelles Jahr:" FontWeight="Bold" />
-                        <Label Content="{Binding CurrentYearTotalAmount}" FontWeight="Bold" />
-                        <Label Content="€" FontStyle="Oblique" />
-                    </StackPanel>
-                </StackPanel>
+                </Grid>
             </Grid>
             <ScrollViewer Grid.Column="1">
                 <Grid>
