@@ -66,25 +66,26 @@ jobs:
             $appLink = if ($appHref) { "<li><a href='$appHref'>Install via ClickOnce (.application)</a></li>" } else { "" }
             $setupLink = if ($setupHref) { "<li><a href='$setupHref'>Download setup.exe</a></li>" } else { "" }
 
-            $html = @"
-<!doctype html>
-<html lang='en'>
-<head>
-  <meta charset='utf-8'>
-  <meta name='viewport' content='width=device-width, initial-scale=1'>
-  <title>CvjmRechnung - Download</title>
-</head>
-<body>
-  <h1>CvjmRechnung</h1>
-  <p>Download and install:</p>
-  <ul>
-    $appLink
-    $setupLink
-  </ul>
-</body>
-</html>
-"@
-            Set-Content -Path $indexPath -Value $html -Encoding UTF8
+            $htmlLines = @(
+              '<!doctype html>'
+              '<html lang=''en''>'
+              '<head>'
+              '  <meta charset=''utf-8''>'
+              '  <meta name=''viewport'' content=''width=device-width, initial-scale=1''>'
+              '  <title>CvjmRechnung - Download</title>'
+              '</head>'
+              '<body>'
+              '  <h1>CvjmRechnung</h1>'
+              '  <p>Download and install:</p>'
+              '  <ul>'
+              "    $appLink"
+              "    $setupLink"
+              '  </ul>'
+              '</body>'
+              '</html>'
+            )
+
+            Set-Content -Path $indexPath -Value ($htmlLines -join [Environment]::NewLine) -Encoding UTF8
           }
 
       - name: Setup Pages
