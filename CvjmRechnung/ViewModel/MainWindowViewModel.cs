@@ -24,23 +24,16 @@ namespace CvjmRechnung.ViewModel
 
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
         private string _emptyPdf = $"{Directory.GetCurrentDirectory()}\\Resources\\empty.pdf";
+        private string _invoiceFolder = GetDefaultInvoiceFolder();
 
         #endregion
 
         #region Properties
 
-        [ObservableProperty]
-        string invoiceFolder = "";
-
         public string InvoiceFolder
         {
-            get
-            {
-                string parentDirectory = Directory.GetParent(Environment.CurrentDirectory)?.FullName
-                    ?? Environment.CurrentDirectory;
-
-                return Path.Combine(parentDirectory, "Rechnungen");
-            }
+            get => _invoiceFolder;
+            private set => SetProperty(ref _invoiceFolder, value);
         }
 
         public string CssFolder => Path.Combine(

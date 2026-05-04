@@ -248,6 +248,6 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Stretch"
             ShowsPreview="False" />
-        <wpf:WebView2 Grid.Column="2" Source="{Binding SelectedItem.PdfPath}" />
+        <wpf:WebView2 Grid.Column="2" Source="{Binding PdfPath}" />
     </Grid>
 </Window>
