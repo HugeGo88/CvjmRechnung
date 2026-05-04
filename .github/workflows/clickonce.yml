@@ -30,13 +30,33 @@ jobs:
       - name: Publish ClickOnce
         run: dotnet publish CvjmRechnung/CvjmRechnung.csproj -c Release -p:PublishProfile=ClickOnce
 
+      - name: Resolve ClickOnce output path
+        id: clickonce_output
+        shell: pwsh
+        run: |
+          $publishDir = Get-ChildItem -Path "CvjmRechnung/bin/Release" -Recurse -Directory -Filter "app.publish" | Select-Object -First 1 -ExpandProperty FullName
+
+          if (-not $publishDir) {
+            $applicationFile = Get-ChildItem -Path "CvjmRechnung/bin/Release" -Recurse -File -Filter "*.application" | Select-Object -First 1
+            if ($applicationFile) {
+              $publishDir = $applicationFile.DirectoryName
+            }
+          }
+
+          if (-not $publishDir) {
+            throw "ClickOnce output folder not found under CvjmRechnung/bin/Release"
+          }
+
+          Write-Host "Resolved ClickOnce output: $publishDir"
+          "path=$publishDir" >> $env:GITHUB_OUTPUT
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
       - name: Upload ClickOnce artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: CvjmRechnung/bin/Release/net8.0-windows/app.publish
+          path: ${{ steps.clickonce_output.outputs.path }}
 
   deploy-pages:
     needs: publish-clickonce
