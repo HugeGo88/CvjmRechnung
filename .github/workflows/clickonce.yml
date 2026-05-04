@@ -28,33 +28,22 @@ jobs:
         run: dotnet restore CvjmRechnung/CvjmRechnung.csproj
 
       - name: Publish ClickOnce
-        run: dotnet publish CvjmRechnung/CvjmRechnung.csproj -c Release -p:PublishProfile=ClickOnce
-
-      - name: Resolve ClickOnce output path
-        id: clickonce_output
         shell: pwsh
         run: |
-          $publishDir = Get-ChildItem -Path "CvjmRechnung/bin/Release" -Recurse -Directory -Filter "app.publish" | Select-Object -First 1 -ExpandProperty FullName
+          $outDir = Join-Path $env:GITHUB_WORKSPACE "clickonce-site"
+          if (Test-Path $outDir) { Remove-Item $outDir -Recurse -Force }
 
-          if (-not $publishDir) {
-            $applicationFile = Get-ChildItem -Path "CvjmRechnung/bin/Release" -Recurse -File -Filter "*.application" | Select-Object -First 1
-            if ($applicationFile) {
-              $publishDir = $applicationFile.DirectoryName
-            }
-          }
-
-          if (-not $publishDir) {
-            throw "ClickOnce output folder not found under CvjmRechnung/bin/Release"
-          }
-
-          Write-Host "Resolved ClickOnce output: $publishDir"
-          "path=$publishDir" >> $env:GITHUB_OUTPUT
+          dotnet publish CvjmRechnung/CvjmRechnung.csproj -c Release -p:PublishProfile=ClickOnce -p:PublishDir="$outDir"
 
       - name: Ensure landing index.html exists
         shell: pwsh
         run: |
-          $publishDir = "${{ steps.clickonce_output.outputs.path }}"
+          $publishDir = Join-Path $env:GITHUB_WORKSPACE "clickonce-site"
           $indexPath = Join-Path $publishDir "index.html"
+
+          if (-not (Test-Path $publishDir)) {
+            throw "Publish output folder not found: $publishDir"
+          }
 
           if (-not (Test-Path $indexPath)) {
             $app = Get-ChildItem -Path $publishDir -File -Filter "*.application" | Select-Object -First 1
@@ -94,7 +83,7 @@ jobs:
       - name: Upload ClickOnce artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ${{ steps.clickonce_output.outputs.path }}
+          path: clickonce-site
 
   deploy-pages:
     needs: publish-clickonce
