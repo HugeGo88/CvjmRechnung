@@ -8,6 +8,7 @@ namespace CvjmRechnung.Services
     {
         public string Password { get; set; } = "";
         public string InvoicePath { get; set; } = "";
+        public string SelectedCssFile { get; set; } = "";
     }
 
     public class ConfigurationService : Interfaces.IConfiguration
@@ -32,6 +33,12 @@ namespace CvjmRechnung.Services
             set => _data.InvoicePath = value ?? "";
         }
 
+        public string SelectedCssFile
+        {
+            get => _data.SelectedCssFile;
+            set => _data.SelectedCssFile = value ?? "";
+        }
+
         public void Load()
         {
             if (!File.Exists(ConfigFileName))
@@ -45,6 +52,7 @@ namespace CvjmRechnung.Services
             _data = (ConfigurationData)serializer.Deserialize(stream)!;
             _data.Password ??= "";
             _data.InvoicePath ??= "";
+            _data.SelectedCssFile ??= "";
         }
 
         public void Save()

@@ -81,21 +81,19 @@ namespace CvjmRechnung.ViewModel
         //public MainWindowViewModel(IMailClient mailClient)
         public MainWindowViewModel(IMailClient mailClientService, IConfiguration configuration)
         {
-            if (!Path.Exists(InvoiceFolder))
-            {
-                Directory.CreateDirectory(InvoiceFolder);
-            }
-            if (!Path.Exists(CssFolder))
-            {
-                Directory.CreateDirectory(CssFolder);
-            }
-            LoadInvoiceFolder();
-            LoadCssFiles();
             iMailClientService = mailClientService;
             iConfiguration = configuration;
             iConfiguration.Load();
 
             SetInvoiceFolderFromConfiguration();
+
+            if (!Path.Exists(CssFolder))
+            {
+                Directory.CreateDirectory(CssFolder);
+            }
+
+            LoadCssFiles();
+            SetSelectedCssFileFromConfiguration();
             LoadInvoiceFolder();
         }
 
@@ -161,6 +159,18 @@ namespace CvjmRechnung.ViewModel
             {
                 AvailableCssFiles.Add(Path.GetFileName(file));
             }
+        }
+
+        private void SetSelectedCssFileFromConfiguration()
+        {
+            if (!string.IsNullOrWhiteSpace(iConfiguration.SelectedCssFile)
+                && AvailableCssFiles.Contains(iConfiguration.SelectedCssFile))
+            {
+                SelectedCssFile = iConfiguration.SelectedCssFile;
+                return;
+            }
+
+            SelectedCssFile = null;
         }
 
         partial void OnSelectedItemChanged(Invoice value)
@@ -663,6 +673,8 @@ namespace CvjmRechnung.ViewModel
             if (dialogResult == true)
             {
                 SetInvoiceFolderFromConfiguration();
+                LoadCssFiles();
+                SetSelectedCssFileFromConfiguration();
 
                 if (!string.Equals(previousInvoiceFolder, InvoiceFolder, StringComparison.OrdinalIgnoreCase))
                 {
