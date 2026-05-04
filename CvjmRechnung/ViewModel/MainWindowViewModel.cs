@@ -40,6 +40,17 @@ namespace CvjmRechnung.ViewModel
             }
         }
 
+        public string CssFolder => Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "CvjmRechnung",
+            "css");
+
+        [ObservableProperty]
+        ObservableCollection<string> availableCssFiles = new();
+
+        [ObservableProperty]
+        string? selectedCssFile = null;
+
         [ObservableProperty]
         ObservableCollection<Invoice> invoices = new();
 
@@ -78,7 +89,12 @@ namespace CvjmRechnung.ViewModel
             {
                 Directory.CreateDirectory(InvoiceFolder);
             }
+            if (!Path.Exists(CssFolder))
+            {
+                Directory.CreateDirectory(CssFolder);
+            }
             LoadInvoiceFolder();
+            LoadCssFiles();
             iMailClientService = mailClientService;
             iConfiguration = configuration;
             iConfiguration.Load();
@@ -104,6 +120,20 @@ namespace CvjmRechnung.ViewModel
             }
             Invoices = new ObservableCollection<Invoice>(Invoices.OrderBy(x => x.Date).Reverse().ToList());
             OnPropertyChanged(nameof(CurrentYearTotalAmount));
+        }
+
+        private void LoadCssFiles()
+        {
+            AvailableCssFiles.Clear();
+            if (!Directory.Exists(CssFolder))
+            {
+                return;
+            }
+            var cssFiles = Directory.GetFiles(CssFolder, "*.css");
+            foreach (var file in cssFiles)
+            {
+                AvailableCssFiles.Add(Path.GetFileName(file));
+            }
         }
 
         partial void OnSelectedItemChanged(Invoice value)
@@ -212,6 +242,20 @@ namespace CvjmRechnung.ViewModel
             content = content.Replace("{ADDRESS_STREET}", SelectedItem.StreetAndNumber);
             content = content.Replace("{ADDRESS_CITY}", SelectedItem.PostalCodeAndCity);
             content = content.Replace("{DATE}", SelectedItem.Date.HasValue ? SelectedItem.Date.Value.ToString("dd MMMM yyyy", CultureInfo.GetCultureInfo("de-DE")) : "");
+
+            string customCssTag = "";
+            if (!string.IsNullOrWhiteSpace(SelectedCssFile))
+            {
+                string cssFilePath = Path.Combine(CssFolder, SelectedCssFile);
+                if (File.Exists(cssFilePath))
+                {
+                    string cssContent = File.ReadAllText(cssFilePath);
+                    customCssTag = $"<style type=\"text/css\">{cssContent}</style>";
+                    _logger.Info($"Applying custom CSS: {SelectedCssFile}");
+                }
+            }
+            content = content.Replace("{CUSTOM_CSS}", customCssTag);
+
             return content;
         }
 

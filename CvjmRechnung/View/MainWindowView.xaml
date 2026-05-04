@@ -216,6 +216,11 @@
                         </StackPanel>
                         <StackPanel Grid.Row="1" Grid.ColumnSpan="2">
                             <Button Command="{Binding SaveFileCommand}" Content="Speichern" />
+                            <Label Content="CSS-Stil für PDF" FontWeight="Bold" />
+                            <ComboBox
+                                ItemsSource="{Binding AvailableCssFiles}"
+                                SelectedItem="{Binding SelectedCssFile}"
+                                ToolTip="CSS-Datei aus %appdata%\CvjmRechnung\css auswählen" />
                             <Button Command="{Binding GeneratePdfCommand}" Content="PDF erzeugen" />
                             <Button
                                 Command="{Binding SendMailCommand}"
