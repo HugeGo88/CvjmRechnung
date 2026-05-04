@@ -50,6 +50,43 @@ jobs:
           Write-Host "Resolved ClickOnce output: $publishDir"
           "path=$publishDir" >> $env:GITHUB_OUTPUT
 
+      - name: Ensure landing index.html exists
+        shell: pwsh
+        run: |
+          $publishDir = "${{ steps.clickonce_output.outputs.path }}"
+          $indexPath = Join-Path $publishDir "index.html"
+
+          if (-not (Test-Path $indexPath)) {
+            $app = Get-ChildItem -Path $publishDir -File -Filter "*.application" | Select-Object -First 1
+            $setup = Get-ChildItem -Path $publishDir -File -Filter "setup.exe" | Select-Object -First 1
+
+            $appHref = if ($app) { $app.Name } else { "" }
+            $setupHref = if ($setup) { $setup.Name } else { "" }
+
+            $appLink = if ($appHref) { "<li><a href='$appHref'>Install via ClickOnce (.application)</a></li>" } else { "" }
+            $setupLink = if ($setupHref) { "<li><a href='$setupHref'>Download setup.exe</a></li>" } else { "" }
+
+            $html = @"
+<!doctype html>
+<html lang='en'>
+<head>
+  <meta charset='utf-8'>
+  <meta name='viewport' content='width=device-width, initial-scale=1'>
+  <title>CvjmRechnung - Download</title>
+</head>
+<body>
+  <h1>CvjmRechnung</h1>
+  <p>Download and install:</p>
+  <ul>
+    $appLink
+    $setupLink
+  </ul>
+</body>
+</html>
+"@
+            Set-Content -Path $indexPath -Value $html -Encoding UTF8
+          }
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
