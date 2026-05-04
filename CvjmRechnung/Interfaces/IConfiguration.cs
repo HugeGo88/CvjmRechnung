@@ -8,6 +8,8 @@
 
         string SelectedCssFile { get; set; }
 
+        string SelectedTemplateFile { get; set; }
+
         void Load();
 
         void Save();

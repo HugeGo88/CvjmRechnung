@@ -14,6 +14,11 @@ namespace CvjmRechnung.View
             "CvjmRechnung",
             "css");
 
+        private static string TemplateFolder => Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "CvjmRechnung",
+            "templates");
+
         public SettingsWindow(IConfiguration configuration)
         {
             InitializeComponent();
@@ -21,6 +26,7 @@ namespace CvjmRechnung.View
             PasswordBox.Password = _configuration.Password;
             InvoicePathTextBox.Text = _configuration.InvoicePath;
             LoadCssFiles();
+            LoadTemplateFiles();
         }
 
         private void LoadCssFiles()
@@ -44,11 +50,33 @@ namespace CvjmRechnung.View
             }
         }
 
+        private void LoadTemplateFiles()
+        {
+            Directory.CreateDirectory(TemplateFolder);
+
+            var templateFiles = Directory
+                .GetFiles(TemplateFolder, "*.html")
+                .Select(Path.GetFileName)
+                .Where(fileName => !string.IsNullOrWhiteSpace(fileName))
+                .Cast<string>()
+                .OrderBy(fileName => fileName)
+                .ToList();
+
+            TemplateFileComboBox.ItemsSource = templateFiles;
+
+            if (!string.IsNullOrWhiteSpace(_configuration.SelectedTemplateFile)
+                && templateFiles.Contains(_configuration.SelectedTemplateFile))
+            {
+                TemplateFileComboBox.SelectedItem = _configuration.SelectedTemplateFile;
+            }
+        }
+
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             _configuration.Password = PasswordBox.Password;
             _configuration.InvoicePath = InvoicePathTextBox.Text;
             _configuration.SelectedCssFile = CssFileComboBox.SelectedItem as string ?? string.Empty;
+            _configuration.SelectedTemplateFile = TemplateFileComboBox.SelectedItem as string ?? string.Empty;
             _configuration.Save();
             DialogResult = true;
             Close();

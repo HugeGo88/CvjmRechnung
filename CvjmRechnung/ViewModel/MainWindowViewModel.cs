@@ -41,6 +41,11 @@ namespace CvjmRechnung.ViewModel
             "CvjmRechnung",
             "css");
 
+        public string TemplateFolder => Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "CvjmRechnung",
+            "templates");
+
         [ObservableProperty]
         ObservableCollection<string> availableCssFiles = new();
 
@@ -257,9 +262,23 @@ namespace CvjmRechnung.ViewModel
             return (string)result;
         }
 
+        private string GetTemplateFilePath()
+        {
+            if (!string.IsNullOrWhiteSpace(iConfiguration.SelectedTemplateFile))
+            {
+                var configuredTemplatePath = Path.Combine(TemplateFolder, iConfiguration.SelectedTemplateFile);
+                if (File.Exists(configuredTemplatePath))
+                {
+                    return configuredTemplatePath;
+                }
+            }
+
+            return Path.Combine("resources", "index.html");
+        }
+
         private string GetHtmlCodeForInvoice()
         {
-            string content = File.ReadAllText("resources/index.html");
+            string content = File.ReadAllText(GetTemplateFilePath());
             content = content.Replace("{ADDRESS_FIELD}", File.ReadAllText("resources/addressField.html"));
             content = content.Replace("{CONTENT}", CreateInvoiceTableHtml(SelectedItem.InvoiceRows.ToList()));
             content = content.Replace("{ADDRESS_COMPANY}", SelectedItem.CompanyName);
