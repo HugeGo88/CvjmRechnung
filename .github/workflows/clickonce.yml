@@ -46,11 +46,11 @@ jobs:
           }
 
           if (-not (Test-Path $indexPath)) {
-            $app = Get-ChildItem -Path $publishDir -File -Filter "*.application" | Select-Object -First 1
-            $setup = Get-ChildItem -Path $publishDir -File -Filter "setup.exe" | Select-Object -First 1
+            $app = Get-ChildItem -Path $publishDir -Recurse -File -Filter "*.application" | Select-Object -First 1
+            $setup = Get-ChildItem -Path $publishDir -Recurse -File -Filter "setup.exe" | Select-Object -First 1
 
-            $appHref = if ($app) { $app.Name } else { "" }
-            $setupHref = if ($setup) { $setup.Name } else { "" }
+            $appHref = if ($app) { [IO.Path]::GetRelativePath($publishDir, $app.FullName).Replace('\\','/') } else { "" }
+            $setupHref = if ($setup) { [IO.Path]::GetRelativePath($publishDir, $setup.FullName).Replace('\\','/') } else { "" }
 
             $appLink = if ($appHref) { "<li><a href='$appHref'>Install via ClickOnce (.application)</a></li>" } else { "" }
             $setupLink = if ($setupHref) { "<li><a href='$setupHref'>Download setup.exe</a></li>" } else { "" }
