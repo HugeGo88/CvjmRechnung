@@ -6,6 +6,8 @@
 
         string InvoicePath { get; set; }
 
+        string SettingsRootPath { get; set; }
+
         string SelectedCssFile { get; set; }
 
         string SelectedTemplateFile { get; set; }

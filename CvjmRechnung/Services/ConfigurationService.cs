@@ -8,17 +8,25 @@ namespace CvjmRechnung.Services
     {
         public string Password { get; set; } = "";
         public string InvoicePath { get; set; } = "";
+        public string SettingsRootPath { get; set; } = "";
         public string SelectedCssFile { get; set; } = "";
         public string SelectedTemplateFile { get; set; } = "";
     }
 
     public class ConfigurationService : Interfaces.IConfiguration
     {
-        private readonly string ConfigFileName = Path.Combine(
+        private static readonly string DefaultSettingsRootPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "CvjmRechnung");
+
+        private static readonly string LocationFileName = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "CvjmRechnung",
-            "config.xml"
-        );
+            "config.location");
+
+        private string _configurationRootPath = DefaultSettingsRootPath;
+
+        private string ConfigFileName => Path.Combine(_configurationRootPath, "config.xml");
 
         private ConfigurationData _data = new();
 
@@ -32,6 +40,12 @@ namespace CvjmRechnung.Services
         {
             get => _data.InvoicePath;
             set => _data.InvoicePath = value ?? "";
+        }
+
+        public string SettingsRootPath
+        {
+            get => _data.SettingsRootPath;
+            set => _data.SettingsRootPath = value ?? "";
         }
 
         public string SelectedCssFile
@@ -48,9 +62,14 @@ namespace CvjmRechnung.Services
 
         public void Load()
         {
+            _configurationRootPath = ResolveConfigurationRootPath();
+
             if (!File.Exists(ConfigFileName))
             {
-                _data = new();
+                _data = new ConfigurationData
+                {
+                    SettingsRootPath = _configurationRootPath
+                };
                 return;
             }
 
@@ -59,18 +78,46 @@ namespace CvjmRechnung.Services
             _data = (ConfigurationData)serializer.Deserialize(stream)!;
             _data.Password ??= "";
             _data.InvoicePath ??= "";
+            _data.SettingsRootPath = string.IsNullOrWhiteSpace(_data.SettingsRootPath)
+                ? _configurationRootPath
+                : _data.SettingsRootPath;
             _data.SelectedCssFile ??= "";
             _data.SelectedTemplateFile ??= "";
         }
 
         public void Save()
         {
-            var directory = Path.GetDirectoryName(ConfigFileName)!;
-            Directory.CreateDirectory(directory);
+            var settingsRootPath = string.IsNullOrWhiteSpace(_data.SettingsRootPath)
+                ? DefaultSettingsRootPath
+                : _data.SettingsRootPath.Trim();
 
-            using var stream = File.Create(ConfigFileName);
-            var serializer = new XmlSerializer(typeof(ConfigurationData));
-            serializer.Serialize(stream, _data);
+            _configurationRootPath = settingsRootPath;
+            _data.SettingsRootPath = settingsRootPath;
+
+            Directory.CreateDirectory(_configurationRootPath);
+            Directory.CreateDirectory(Path.GetDirectoryName(LocationFileName)!);
+
+            using (var stream = File.Create(ConfigFileName))
+            {
+                var serializer = new XmlSerializer(typeof(ConfigurationData));
+                serializer.Serialize(stream, _data);
+            }
+
+            File.WriteAllText(LocationFileName, _configurationRootPath);
+        }
+
+        private static string ResolveConfigurationRootPath()
+        {
+            if (File.Exists(LocationFileName))
+            {
+                var configuredPath = File.ReadAllText(LocationFileName).Trim();
+                if (!string.IsNullOrWhiteSpace(configuredPath))
+                {
+                    return configuredPath;
+                }
+            }
+
+            return DefaultSettingsRootPath;
         }
     }
 }

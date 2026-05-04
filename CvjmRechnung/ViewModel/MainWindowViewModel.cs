@@ -36,15 +36,13 @@ namespace CvjmRechnung.ViewModel
             private set => SetProperty(ref _invoiceFolder, value);
         }
 
-        public string CssFolder => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "CvjmRechnung",
-            "css");
+        public string SettingsRootFolder => string.IsNullOrWhiteSpace(iConfiguration.SettingsRootPath)
+            ? GetDefaultSettingsRootFolder()
+            : iConfiguration.SettingsRootPath;
 
-        public string TemplateFolder => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "CvjmRechnung",
-            "templates");
+        public string CssFolder => Path.Combine(SettingsRootFolder, "css");
+
+        public string TemplateFolder => Path.Combine(SettingsRootFolder, "templates");
 
         [ObservableProperty]
         ObservableCollection<string> availableCssFiles = new();
@@ -114,6 +112,13 @@ namespace CvjmRechnung.ViewModel
             return Path.Combine(parentDirectory, "Rechnungen");
         }
 
+        private static string GetDefaultSettingsRootFolder()
+        {
+            return Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                "CvjmRechnung");
+        }
+
         private void SetInvoiceFolderFromConfiguration()
         {
             InvoiceFolder = string.IsNullOrWhiteSpace(iConfiguration.InvoicePath)
@@ -155,10 +160,8 @@ namespace CvjmRechnung.ViewModel
         private void LoadCssFiles()
         {
             AvailableCssFiles.Clear();
-            if (!Directory.Exists(CssFolder))
-            {
-                return;
-            }
+            Directory.CreateDirectory(CssFolder);
+
             var cssFiles = Directory.GetFiles(CssFolder, "*.css");
             foreach (var file in cssFiles)
             {

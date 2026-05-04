@@ -1,4 +1,5 @@
 using CvjmRechnung.Interfaces;
+using Microsoft.Win32;
 using System.IO;
 using System.Linq;
 using System.Windows;
@@ -9,15 +10,17 @@ namespace CvjmRechnung.View
     {
         private readonly IConfiguration _configuration;
 
-        private static string CssFolder => Path.Combine(
+        private static string DefaultSettingsFolder => Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "CvjmRechnung",
-            "css");
+            "CvjmRechnung");
 
-        private static string TemplateFolder => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "CvjmRechnung",
-            "templates");
+        private string SettingsFolder => string.IsNullOrWhiteSpace(SettingsPathTextBox.Text)
+            ? DefaultSettingsFolder
+            : SettingsPathTextBox.Text.Trim();
+
+        private string CssFolder => Path.Combine(SettingsFolder, "css");
+
+        private string TemplateFolder => Path.Combine(SettingsFolder, "templates");
 
         public SettingsWindow(IConfiguration configuration)
         {
@@ -25,6 +28,9 @@ namespace CvjmRechnung.View
             _configuration = configuration;
             PasswordBox.Password = _configuration.Password;
             InvoicePathTextBox.Text = _configuration.InvoicePath;
+            SettingsPathTextBox.Text = string.IsNullOrWhiteSpace(_configuration.SettingsRootPath)
+                ? DefaultSettingsFolder
+                : _configuration.SettingsRootPath;
             LoadCssFiles();
             LoadTemplateFiles();
         }
@@ -42,6 +48,7 @@ namespace CvjmRechnung.View
                 .ToList();
 
             CssFileComboBox.ItemsSource = cssFiles;
+            CssFileComboBox.ToolTip = $"CSS-Datei aus {CssFolder} auswaehlen";
 
             if (!string.IsNullOrWhiteSpace(_configuration.SelectedCssFile)
                 && cssFiles.Contains(_configuration.SelectedCssFile))
@@ -63,6 +70,7 @@ namespace CvjmRechnung.View
                 .ToList();
 
             TemplateFileComboBox.ItemsSource = templateFiles;
+            TemplateFileComboBox.ToolTip = $"HTML-Datei aus {TemplateFolder} auswaehlen";
 
             if (!string.IsNullOrWhiteSpace(_configuration.SelectedTemplateFile)
                 && templateFiles.Contains(_configuration.SelectedTemplateFile))
@@ -71,12 +79,34 @@ namespace CvjmRechnung.View
             }
         }
 
+        private void BrowseSettingsPath_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFolderDialog
+            {
+                Title = "Ordner fuer Einstellungen und Templates auswaehlen",
+                InitialDirectory = Directory.Exists(SettingsFolder) ? SettingsFolder : DefaultSettingsFolder,
+                Multiselect = false
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                SettingsPathTextBox.Text = dialog.FolderName;
+                LoadCssFiles();
+                LoadTemplateFiles();
+            }
+        }
+
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             _configuration.Password = PasswordBox.Password;
             _configuration.InvoicePath = InvoicePathTextBox.Text;
+            _configuration.SettingsRootPath = SettingsFolder;
             _configuration.SelectedCssFile = CssFileComboBox.SelectedItem as string ?? string.Empty;
             _configuration.SelectedTemplateFile = TemplateFileComboBox.SelectedItem as string ?? string.Empty;
+
+            Directory.CreateDirectory(Path.Combine(SettingsFolder, "css"));
+            Directory.CreateDirectory(Path.Combine(SettingsFolder, "templates"));
+
             _configuration.Save();
             DialogResult = true;
             Close();
