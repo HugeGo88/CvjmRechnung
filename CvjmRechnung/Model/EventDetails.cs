@@ -4,6 +4,7 @@
     public class EventDetails
     {
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+        public const string DefaultIcsPath = "http://cvjm-walheim.de/buchungen";
 
         public string EventName { get; set; } = "";
         public string Name { get; set; } = "";
@@ -21,11 +22,12 @@
             return $"EventId: {EventId} Name: {Name}";
         }
 
-        public static async Task<List<EventDetails>> GetEventDetails()
+        public static async Task<List<EventDetails>> GetEventDetails(string? icsPath = null)
         {
             IcsReader icsReader = new IcsReader();
             List<EventDetails> eventDetails = new List<EventDetails>();
-            List<Ical.Net.CalendarComponents.CalendarEvent> events = await icsReader.ReadIcsFromUrl("http://cvjm-walheim.de/buchungen");
+            var sourcePath = string.IsNullOrWhiteSpace(icsPath) ? DefaultIcsPath : icsPath.Trim();
+            List<Ical.Net.CalendarComponents.CalendarEvent> events = await icsReader.ReadIcsFromUrl(sourcePath);
             foreach (var elem in events)
             {
                 _logger.Info($"ID: {elem.Uid}  {Environment.NewLine}Description: {elem.Description}");

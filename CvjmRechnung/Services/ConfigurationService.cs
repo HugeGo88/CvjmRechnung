@@ -11,6 +11,7 @@ namespace CvjmRechnung.Services
         public string SettingsRootPath { get; set; } = "";
         public string SelectedCssFile { get; set; } = "";
         public string SelectedTemplateFile { get; set; } = "";
+        public string IcsPath { get; set; } = "";
     }
 
     public class ConfigurationService : Interfaces.IConfiguration
@@ -60,6 +61,12 @@ namespace CvjmRechnung.Services
             set => _data.SelectedTemplateFile = value ?? "";
         }
 
+        public string IcsPath
+        {
+            get => _data.IcsPath;
+            set => _data.IcsPath = value ?? "";
+        }
+
         public void Load()
         {
             _configurationRootPath = ResolveConfigurationRootPath();
@@ -83,6 +90,7 @@ namespace CvjmRechnung.Services
                 : _data.SettingsRootPath;
             _data.SelectedCssFile ??= "";
             _data.SelectedTemplateFile ??= "";
+            _data.IcsPath ??= "";
         }
 
         public void Save()

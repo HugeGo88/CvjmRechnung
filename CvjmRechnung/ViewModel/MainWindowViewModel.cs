@@ -557,7 +557,7 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void AddNewInvoice()
         {
-            var selectionWindow = new InvoicesView();
+            var selectionWindow = new InvoicesView(iConfiguration.IcsPath);
             bool? dialogResult = selectionWindow.ShowDialog();
 
             _logger.Info("Add new invoice button pressed");
@@ -620,7 +620,7 @@ namespace CvjmRechnung.ViewModel
                 return;
             }
 
-            List<EventDetails> eventDetails = await EventDetails.GetEventDetails();
+            List<EventDetails> eventDetails = await EventDetails.GetEventDetails(iConfiguration.IcsPath);
 
             if (eventDetails.Any(x => x.EventId.Trim() == SelectedItem.OrderNumber.Trim()))
             {

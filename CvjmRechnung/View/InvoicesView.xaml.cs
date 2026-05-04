@@ -14,10 +14,12 @@ namespace CvjmRechnung.View
         public object? SelectedEventItem { get; private set; }
 
         public ObservableCollection<EventDetails> AllEvents { get; set; } = new ObservableCollection<EventDetails>();
+        private readonly string? _icsPath;
 
-        public InvoicesView()
+        public InvoicesView(string? icsPath = null)
         {
             InitializeComponent();
+            _icsPath = icsPath;
             ListViewItems.ItemsSource = AllEvents;
             this.Loaded += OnWindowLoaded;
         }
@@ -26,7 +28,7 @@ namespace CvjmRechnung.View
         {
             // Load the new list of data
             Mouse.OverrideCursor = Cursors.Wait;
-            List<EventDetails> newEvents = await EventDetails.GetEventDetails();
+            List<EventDetails> newEvents = await EventDetails.GetEventDetails(_icsPath);
             Mouse.OverrideCursor = null;
 
             // 2. Clear the old collection and add the new items to the existing collection instance

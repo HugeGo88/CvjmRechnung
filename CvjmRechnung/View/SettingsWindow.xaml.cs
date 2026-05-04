@@ -31,6 +31,7 @@ namespace CvjmRechnung.View
             SettingsPathTextBox.Text = string.IsNullOrWhiteSpace(_configuration.SettingsRootPath)
                 ? DefaultSettingsFolder
                 : _configuration.SettingsRootPath;
+            IcsPathTextBox.Text = _configuration.IcsPath;
             LoadCssFiles();
             LoadTemplateFiles();
         }
@@ -103,6 +104,7 @@ namespace CvjmRechnung.View
             _configuration.SettingsRootPath = SettingsFolder;
             _configuration.SelectedCssFile = CssFileComboBox.SelectedItem as string ?? string.Empty;
             _configuration.SelectedTemplateFile = TemplateFileComboBox.SelectedItem as string ?? string.Empty;
+            _configuration.IcsPath = IcsPathTextBox.Text;
 
             Directory.CreateDirectory(Path.Combine(SettingsFolder, "css"));
             Directory.CreateDirectory(Path.Combine(SettingsFolder, "templates"));

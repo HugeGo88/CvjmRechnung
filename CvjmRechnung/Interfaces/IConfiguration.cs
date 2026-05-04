@@ -12,6 +12,8 @@
 
         string SelectedTemplateFile { get; set; }
 
+        string IcsPath { get; set; }
+
         void Load();
 
         void Save();
