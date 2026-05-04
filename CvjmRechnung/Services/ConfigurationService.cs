@@ -7,6 +7,7 @@ namespace CvjmRechnung.Services
     public class ConfigurationData
     {
         public string Password { get; set; } = "";
+        public string InvoicePath { get; set; } = "";
     }
 
     public class ConfigurationService : Interfaces.IConfiguration
@@ -25,6 +26,12 @@ namespace CvjmRechnung.Services
             set => _data.Password = value ?? "";
         }
 
+        public string InvoicePath
+        {
+            get => _data.InvoicePath;
+            set => _data.InvoicePath = value ?? "";
+        }
+
         public void Load()
         {
             if (!File.Exists(ConfigFileName))
@@ -36,6 +43,8 @@ namespace CvjmRechnung.Services
             using var stream = File.OpenRead(ConfigFileName);
             var serializer = new XmlSerializer(typeof(ConfigurationData));
             _data = (ConfigurationData)serializer.Deserialize(stream)!;
+            _data.Password ??= "";
+            _data.InvoicePath ??= "";
         }
 
         public void Save()

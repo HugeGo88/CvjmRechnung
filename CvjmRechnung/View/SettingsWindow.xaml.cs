@@ -12,11 +12,13 @@ namespace CvjmRechnung.View
             InitializeComponent();
             _configuration = configuration;
             PasswordBox.Password = _configuration.Password;
+            InvoicePathTextBox.Text = _configuration.InvoicePath;
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
             _configuration.Password = PasswordBox.Password;
+            _configuration.InvoicePath = InvoicePathTextBox.Text;
             _configuration.Save();
             DialogResult = true;
             Close();

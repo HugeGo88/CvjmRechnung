@@ -4,6 +4,8 @@
     {
         string Password { get; set; }
 
+        string InvoicePath { get; set; }
+
         void Load();
 
         void Save();
