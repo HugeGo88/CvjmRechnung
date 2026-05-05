@@ -26,14 +26,29 @@ namespace CvjmRechnung.Services
 
                 var existing = LoadAll(eventsFolder);
 
-                // Merge by EventId - only add events not already stored
-                var existingIds = new HashSet<string>(existing.Select(e => e.EventId));
+                // Build a lookup by EventId so we can upsert: add new events and update changed ones
+                var existingById = existing.ToDictionary(e => e.EventId, e => e);
                 foreach (var evt in newEvents)
                 {
-                    if (!existingIds.Contains(evt.EventId))
+                    if (existingById.TryGetValue(evt.EventId, out var stored))
+                    {
+                        // Update all fields if anything has changed
+                        if (!EventsEqual(stored, evt))
+                        {
+                            stored.EventName = evt.EventName;
+                            stored.Name = evt.Name;
+                            stored.Street = evt.Street;
+                            stored.City = evt.City;
+                            stored.Email = evt.Email;
+                            stored.Description = evt.Description;
+                            stored.StartDate = evt.StartDate;
+                            stored.EndDate = evt.EndDate;
+                        }
+                    }
+                    else
                     {
                         existing.Add(evt);
-                        existingIds.Add(evt.EventId);
+                        existingById[evt.EventId] = evt;
                     }
                 }
 
@@ -46,6 +61,18 @@ namespace CvjmRechnung.Services
             {
                 _logger.Error(ex, "Error saving stored events: {ex.Message}", ex.Message);
             }
+        }
+
+        private static bool EventsEqual(EventDetails a, EventDetails b)
+        {
+            return a.EventName == b.EventName
+                && a.Name == b.Name
+                && a.Street == b.Street
+                && a.City == b.City
+                && a.Email == b.Email
+                && a.Description == b.Description
+                && a.StartDate == b.StartDate
+                && a.EndDate == b.EndDate;
         }
 
         public static List<EventDetails> LoadAll(string eventsFolder)
