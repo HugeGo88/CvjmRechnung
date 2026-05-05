@@ -1,4 +1,5 @@
 ﻿using CvjmRechnung.Model;
+using CvjmRechnung.Services;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Input;
@@ -14,28 +15,45 @@ namespace CvjmRechnung.View
         public object? SelectedEventItem { get; private set; }
 
         public ObservableCollection<EventDetails> AllEvents { get; set; } = new ObservableCollection<EventDetails>();
+        public ObservableCollection<EventDetails> PastEvents { get; set; } = new ObservableCollection<EventDetails>();
         private readonly string? _icsPath;
+        private readonly string? _eventsFolder;
 
-        public InvoicesView(string? icsPath = null)
+        public InvoicesView(string? icsPath = null, string? eventsFolder = null)
         {
             InitializeComponent();
             _icsPath = icsPath;
+            _eventsFolder = eventsFolder;
             ListViewItems.ItemsSource = AllEvents;
+            PastListViewItems.ItemsSource = PastEvents;
             this.Loaded += OnWindowLoaded;
         }
 
         private async void OnWindowLoaded(object sender, RoutedEventArgs e)
         {
-            // Load the new list of data
+            // Load the new list of data from ICS
             Mouse.OverrideCursor = Cursors.Wait;
             List<EventDetails> newEvents = await EventDetails.GetEventDetails(_icsPath);
             Mouse.OverrideCursor = null;
 
-            // 2. Clear the old collection and add the new items to the existing collection instance
+            // Update the current events collection
             AllEvents.Clear();
             foreach (var eventDetail in newEvents)
             {
                 AllEvents.Add(eventDetail);
+            }
+
+            // Store fetched events for later use and load past events
+            if (!string.IsNullOrWhiteSpace(_eventsFolder))
+            {
+                EventStorageService.MergeAndSave(newEvents, _eventsFolder);
+
+                var pastEvents = EventStorageService.LoadPastEvents(_eventsFolder);
+                PastEvents.Clear();
+                foreach (var eventDetail in pastEvents)
+                {
+                    PastEvents.Add(eventDetail);
+                }
             }
         }
 
@@ -51,6 +69,17 @@ namespace CvjmRechnung.View
                 SelectedEventItem = selectedItem;
 
                 // 4. Set DialogResult to true to close the modal window and return success
+                this.DialogResult = true;
+            }
+        }
+
+        private void PastListViewItems_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            object? selectedItem = PastListViewItems.SelectedItem;
+
+            if (selectedItem != null)
+            {
+                SelectedEventItem = selectedItem;
                 this.DialogResult = true;
             }
         }

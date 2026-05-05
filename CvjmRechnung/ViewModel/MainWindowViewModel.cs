@@ -557,7 +557,8 @@ namespace CvjmRechnung.ViewModel
         [RelayCommand]
         void AddNewInvoice()
         {
-            var selectionWindow = new InvoicesView(iConfiguration.IcsPath);
+            var eventsFolder = Path.Combine(SettingsRootFolder, "events");
+            var selectionWindow = new InvoicesView(iConfiguration.IcsPath, eventsFolder);
             bool? dialogResult = selectionWindow.ShowDialog();
 
             _logger.Info("Add new invoice button pressed");
