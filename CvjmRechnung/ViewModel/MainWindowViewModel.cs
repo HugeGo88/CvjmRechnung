@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Input;
 using CvjmRechnung.Interfaces;
 using CvjmRechnung.Model;
+using CvjmRechnung.Services;
 using CvjmRechnung.View;
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Win32;
@@ -622,10 +623,18 @@ namespace CvjmRechnung.ViewModel
             }
 
             List<EventDetails> eventDetails = await EventDetails.GetEventDetails(iConfiguration.IcsPath);
+            var searchedOrderNumber = SelectedItem.OrderNumber.Trim();
+            EventDetails? foundEvent = eventDetails.FirstOrDefault(x => x.EventId.Trim() == searchedOrderNumber);
 
-            if (eventDetails.Any(x => x.EventId.Trim() == SelectedItem.OrderNumber.Trim()))
+            if (foundEvent is null)
             {
-                EventDetails foundEvent = eventDetails.First(x => x.EventId.Trim() == SelectedItem.OrderNumber.Trim());
+                var eventsFolder = Path.Combine(SettingsRootFolder, "events");
+                var pastEvents = EventStorageService.LoadPastEvents(eventsFolder);
+                foundEvent = pastEvents.FirstOrDefault(x => x.EventId.Trim() == searchedOrderNumber);
+            }
+
+            if (foundEvent is not null)
+            {
                 SelectedItem.CompanyName = foundEvent.EventName;
                 SelectedItem.FirstAndLastName = foundEvent.Name;
                 SelectedItem.StreetAndNumber = foundEvent.Street;
