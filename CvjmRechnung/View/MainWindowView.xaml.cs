@@ -1,6 +1,7 @@
 ﻿using CvjmRechnung.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
 using System.Globalization;
+using System.Reflection;
 using System.Windows;
 
 namespace CvjmRechnung
@@ -18,6 +19,12 @@ namespace CvjmRechnung
             CultureInfo ci = CultureInfo.CreateSpecificCulture(CultureInfo.CurrentCulture.Name);
             ci.DateTimeFormat.ShortDatePattern = "dd-MM-yyyy";
             Thread.CurrentThread.CurrentCulture = ci;
+
+            var version = Assembly.GetExecutingAssembly().GetName().Version;
+            if (version is not null)
+            {
+                Title = $"{Title} v{version.Major}.{version.Minor}.{version.Build}";
+            }
         }
     }
 }
