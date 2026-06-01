@@ -33,6 +33,15 @@ jobs:
           fi
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+      - name: Read release settings
+        id: release-settings
+        shell: bash
+        run: |
+          REPOSITORY_URL="$(grep -oE '<RepositoryUrl>[^<]+' CvjmRechnung/CvjmRechnung.csproj | sed 's/<RepositoryUrl>//')"
+          VELOPACK_VERSION="$(grep -oE '<VelopackVersion>[^<]+' CvjmRechnung/CvjmRechnung.csproj | sed 's/<VelopackVersion>//')"
+          echo "repository_url=$REPOSITORY_URL" >> "$GITHUB_OUTPUT"
+          echo "velopack_version=$VELOPACK_VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Restore
         run: dotnet restore CvjmRechnung/CvjmRechnung.csproj
 
@@ -51,8 +60,8 @@ jobs:
       - name: Create Velopack release
         shell: bash
         run: |
-          dotnet tool install -g vpk --version 1.1.1
+          dotnet tool install -g vpk --version "${{ steps.release-settings.outputs.velopack_version }}"
           export PATH="$PATH:$HOME/.dotnet/tools"
-          vpk download github --repoUrl "https://github.com/${{ github.repository }}" --token "${{ secrets.GITHUB_TOKEN }}"
+          vpk download github --repoUrl "${{ steps.release-settings.outputs.repository_url }}" --token "${{ secrets.GITHUB_TOKEN }}"
           vpk pack -u CvjmRechnung -v "${{ steps.get-version.outputs.version }}" -p publish
-          vpk upload github --repoUrl "https://github.com/${{ github.repository }}" --publish --releaseName "CvjmRechnung ${{ steps.get-version.outputs.version }}" --tag "v${{ steps.get-version.outputs.version }}" --token "${{ secrets.GITHUB_TOKEN }}"
+          vpk upload github --repoUrl "${{ steps.release-settings.outputs.repository_url }}" --publish --releaseName "CvjmRechnung ${{ steps.get-version.outputs.version }}" --tag "v${{ steps.get-version.outputs.version }}" --token "${{ secrets.GITHUB_TOKEN }}"

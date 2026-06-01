@@ -10,6 +10,8 @@
     <Version>0.1.0</Version>
     <AssemblyVersion>0.1.0.0</AssemblyVersion>
     <FileVersion>0.1.0.0</FileVersion>
+    <RepositoryUrl>https://github.com/HugeGo88/CvjmRechnung</RepositoryUrl>
+    <VelopackVersion>1.1.1</VelopackVersion>
     <Authors>HugeGo88</Authors>
     <Company>HugeGo88</Company>
     <Product>CvjmRechnung</Product>
@@ -24,6 +26,13 @@
   <ItemGroup>
     <ApplicationDefinition Remove="App.xaml" />
     <Page Include="App.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>RepositoryUrl</_Parameter1>
+      <_Parameter2>$(RepositoryUrl)</_Parameter2>
+    </AssemblyAttribute>
   </ItemGroup>
 
   <ItemGroup>
@@ -44,7 +53,7 @@
     <PackageReference Include="NLog.Schema" Version="6.0.4" />
     <PackageReference Include="QRCoder" Version="1.6.0" />
     <PackageReference Include="SimpleHtmlToPdf" Version="3.0.5" />
-    <PackageReference Include="Velopack" Version="1.1.1" />
+    <PackageReference Include="Velopack" Version="$(VelopackVersion)" />
   </ItemGroup>
 
   <ItemGroup>

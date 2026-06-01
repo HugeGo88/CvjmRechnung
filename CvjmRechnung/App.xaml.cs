@@ -2,6 +2,7 @@
 using CvjmRechnung.Services;
 using CvjmRechnung.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using System.Windows;
 using Velopack;
 using Velopack.Sources;
@@ -13,7 +14,6 @@ namespace CvjmRechnung
     /// </summary>
     public partial class App : Application
     {
-        private const string ReleasesUrl = "https://github.com/HugeGo88/CvjmRechnung";
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         [STAThread]
@@ -54,19 +54,19 @@ namespace CvjmRechnung
             e.SetObserved();
         }
 
-        protected override void OnStartup(StartupEventArgs e)
+        protected override async void OnStartup(StartupEventArgs e)
         {
             // Subscribe to the DispatcherUnhandledException event
             this.DispatcherUnhandledException += App_DispatcherUnhandledException;
             base.OnStartup(e);
-            _ = CheckForUpdatesAsync();
+            await CheckForUpdatesAsync();
         }
 
         private async Task CheckForUpdatesAsync()
         {
             try
             {
-                var updateManager = new UpdateManager(new GithubSource(ReleasesUrl, string.Empty, false, null));
+                var updateManager = new UpdateManager(new GithubSource(GetRepositoryUrl(), string.Empty, false, null));
                 if (!updateManager.IsInstalled)
                 {
                     _logger.Info("Skipping update check because the app is not installed from a packaged release.");
@@ -99,6 +99,16 @@ namespace CvjmRechnung
             {
                 _logger.Warn(ex, "Unable to check for updates.");
             }
+        }
+
+        private static string GetRepositoryUrl()
+        {
+            return Assembly
+                .GetExecutingAssembly()
+                .GetCustomAttributes<AssemblyMetadataAttribute>()
+                .FirstOrDefault(attribute => attribute.Key == "RepositoryUrl")
+                ?.Value
+                ?? "https://github.com/HugeGo88/CvjmRechnung";
         }
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
