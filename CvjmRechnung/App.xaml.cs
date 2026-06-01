@@ -3,6 +3,8 @@ using CvjmRechnung.Services;
 using CvjmRechnung.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
+using Velopack;
+using Velopack.Sources;
 
 namespace CvjmRechnung
 {
@@ -11,18 +13,35 @@ namespace CvjmRechnung
     /// </summary>
     public partial class App : Application
     {
+        private const string ReleasesUrl = "https://github.com/HugeGo88/CvjmRechnung";
         private static readonly NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
+        [STAThread]
+        private static void Main(string[] args)
+        {
+            try
+            {
+                _logger.Info("***** PROGRAM STARTED *****");
+
+                VelopackApp.Build().Run();
+
+                var app = new App();
+                app.InitializeComponent();
+                app.Run();
+            }
+            catch (Exception ex)
+            {
+                _logger.Fatal(ex, "Fatal exception in application entry point");
+                MessageBox.Show($"Fatal Error: {ex.Message}\nApplication is shutting down.", "Fatal Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
 
         public App()
         {
-            _logger.Info("***** PROGRAM STARTED *****");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Services = ConfigureServices();
             // Subscribe to unobserved task exceptions
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
-
-            this.InitializeComponent();
         }
 
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
@@ -40,6 +59,46 @@ namespace CvjmRechnung
             // Subscribe to the DispatcherUnhandledException event
             this.DispatcherUnhandledException += App_DispatcherUnhandledException;
             base.OnStartup(e);
+            _ = CheckForUpdatesAsync();
+        }
+
+        private async Task CheckForUpdatesAsync()
+        {
+            try
+            {
+                var updateManager = new UpdateManager(new GithubSource(ReleasesUrl, string.Empty, false, null));
+                if (!updateManager.IsInstalled)
+                {
+                    _logger.Info("Skipping update check because the app is not installed from a packaged release.");
+                    return;
+                }
+
+                var update = await updateManager.CheckForUpdatesAsync();
+                if (update is null)
+                {
+                    _logger.Info("No application update available.");
+                    return;
+                }
+
+                var result = MessageBox.Show(
+                    $"Version {update.TargetFullRelease.Version} ist verfügbar. Möchtest du das Update jetzt herunterladen und die App neu starten?",
+                    "Update verfügbar",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Information);
+
+                if (result != MessageBoxResult.Yes)
+                {
+                    _logger.Info("User skipped the available update.");
+                    return;
+                }
+
+                await updateManager.DownloadUpdatesAsync(update);
+                updateManager.ApplyUpdatesAndRestart(update);
+            }
+            catch (Exception ex)
+            {
+                _logger.Warn(ex, "Unable to check for updates.");
+            }
         }
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)

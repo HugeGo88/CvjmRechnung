@@ -1,18 +1,16 @@
-name: Publish ClickOnce
+name: Build and Release
 
 on:
-  workflow_dispatch:
   push:
     tags:
       - 'v*.*.*'
+  workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 
 jobs:
-  publish-clickonce:
+  build-and-release:
     runs-on: windows-latest
 
     steps:
@@ -24,94 +22,37 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      - name: Get version
+        id: get-version
+        shell: bash
+        run: |
+          if [[ "${GITHUB_REF_TYPE}" == "tag" ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="$(grep -oE '<Version>[^<]+' CvjmRechnung/CvjmRechnung.csproj | sed 's/<Version>//')"
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
       - name: Restore
         run: dotnet restore CvjmRechnung/CvjmRechnung.csproj
 
-      - name: Publish ClickOnce
-        shell: pwsh
+      - name: Publish release build
+        run: >
+          dotnet publish CvjmRechnung/CvjmRechnung.csproj
+          -c Release
+          -o publish
+          -r win-x64
+          --self-contained true
+          -p:Version=${{ steps.get-version.outputs.version }}
+          -p:AssemblyVersion=${{ steps.get-version.outputs.version }}.0
+          -p:FileVersion=${{ steps.get-version.outputs.version }}.0
+          -p:InformationalVersion=${{ steps.get-version.outputs.version }}
+
+      - name: Create Velopack release
+        shell: bash
         run: |
-          $publishDir = Join-Path $env:GITHUB_WORKSPACE "clickonce-publish"
-          if (Test-Path $publishDir) { Remove-Item $publishDir -Recurse -Force }
-
-          dotnet publish CvjmRechnung/CvjmRechnung.csproj -c Release -p:PublishProfile=ClickOnce -p:PublishDir="$publishDir"
-
-      - name: Ensure landing index.html exists
-        shell: pwsh
-        run: |
-          $publishDir = Join-Path $env:GITHUB_WORKSPACE "clickonce-publish"
-          $indexPath = Join-Path $publishDir "index.html"
-
-          if (-not (Test-Path $publishDir)) {
-            throw "Publish output folder not found: $publishDir"
-          }
-
-          if (-not (Test-Path $indexPath)) {
-            $app = Get-ChildItem -Path $publishDir -Recurse -File -Filter "*.application" | Select-Object -First 1
-            $setup = Get-ChildItem -Path $publishDir -Recurse -File -Filter "setup.exe" | Select-Object -First 1
-
-            $appHref = if ($app) { [IO.Path]::GetRelativePath($publishDir, $app.FullName).Replace('\\','/') } else { "" }
-            $setupHref = if ($setup) { [IO.Path]::GetRelativePath($publishDir, $setup.FullName).Replace('\\','/') } else { "" }
-
-            $appLink = if ($appHref) { "<li><a href='$appHref'>Install via ClickOnce (.application)</a></li>" } else { "" }
-            $setupLink = if ($setupHref) { "<li><a href='$setupHref'>Download setup.exe</a></li>" } else { "" }
-
-            $htmlLines = @(
-              '<!doctype html>'
-              '<html lang=''en''>'
-              '<head>'
-              '  <meta charset=''utf-8''>'
-              '  <meta name=''viewport'' content=''width=device-width, initial-scale=1''>'
-              '  <title>CvjmRechnung - Download</title>'
-              '</head>'
-              '<body>'
-              '  <h1>CvjmRechnung</h1>'
-              '  <p>Download and install:</p>'
-              '  <ul>'
-              "    $appLink"
-              "    $setupLink"
-              '  </ul>'
-              '</body>'
-              '</html>'
-            )
-
-            Set-Content -Path $indexPath -Value ($htmlLines -join [Environment]::NewLine) -Encoding UTF8
-          }
-
-      - name: Prepare Pages artifact with CvjmRechnung subpath
-        shell: pwsh
-        run: |
-          $publishDir = Join-Path $env:GITHUB_WORKSPACE "clickonce-publish"
-          $siteRoot = Join-Path $env:GITHUB_WORKSPACE "site"
-          $appRoot = Join-Path $siteRoot "CvjmRechnung"
-
-          if (Test-Path $siteRoot) { Remove-Item $siteRoot -Recurse -Force }
-          New-Item -ItemType Directory -Path $appRoot -Force | Out-Null
-
-          Copy-Item -Path (Join-Path $publishDir '*') -Destination $appRoot -Recurse -Force
-
-      - name: Ensure CNAME for custom domain
-        shell: pwsh
-        run: |
-          $siteRoot = Join-Path $env:GITHUB_WORKSPACE "site"
-          Set-Content -Path (Join-Path $siteRoot "CNAME") -Value "www.tausch.one" -Encoding ascii
-          Set-Content -Path (Join-Path $siteRoot ".nojekyll") -Value "" -Encoding ascii
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload ClickOnce artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
-
-  deploy-pages:
-    needs: publish-clickonce
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          dotnet tool install -g vpk --version 1.1.1
+          export PATH="$PATH:$HOME/.dotnet/tools"
+          vpk download github --repoUrl "https://github.com/${{ github.repository }}" --token "${{ secrets.GITHUB_TOKEN }}"
+          vpk pack -u CvjmRechnung -v "${{ steps.get-version.outputs.version }}" -p publish
+          vpk upload github --repoUrl "https://github.com/${{ github.repository }}" --publish --releaseName "CvjmRechnung ${{ steps.get-version.outputs.version }}" --tag "v${{ steps.get-version.outputs.version }}" --token "${{ secrets.GITHUB_TOKEN }}"

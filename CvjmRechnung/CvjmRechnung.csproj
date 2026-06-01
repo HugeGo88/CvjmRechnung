@@ -7,12 +7,24 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>Untitled.ico</ApplicationIcon>
+    <Version>0.1.0</Version>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <Authors>HugeGo88</Authors>
+    <Company>HugeGo88</Company>
+    <Product>CvjmRechnung</Product>
+    <StartupObject>CvjmRechnung.App</StartupObject>
 
 	  <!--<PublishSingleFile>true</PublishSingleFile>-->
 	  <!--<SelfContained>true</SelfContained>-->
 	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
 	  <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ApplicationDefinition Remove="App.xaml" />
+    <Page Include="App.xaml" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Remove="NLog.xsd" />
@@ -32,6 +44,7 @@
     <PackageReference Include="NLog.Schema" Version="6.0.4" />
     <PackageReference Include="QRCoder" Version="1.6.0" />
     <PackageReference Include="SimpleHtmlToPdf" Version="3.0.5" />
+    <PackageReference Include="Velopack" Version="1.1.1" />
   </ItemGroup>
 
   <ItemGroup>
