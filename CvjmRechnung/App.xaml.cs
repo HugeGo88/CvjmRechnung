@@ -2,7 +2,6 @@
 using CvjmRechnung.Services;
 using CvjmRechnung.ViewModel;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 using System.Windows;
 using Velopack;
 using Velopack.Sources;
@@ -19,30 +18,40 @@ namespace CvjmRechnung
         [STAThread]
         private static void Main(string[] args)
         {
-            try
-            {
-                _logger.Info("***** PROGRAM STARTED *****");
+            VelopackApp.Build().Run();
 
-                VelopackApp.Build().Run();
-
-                var app = new App();
-                app.InitializeComponent();
-                app.Run();
-            }
-            catch (Exception ex)
-            {
-                _logger.Fatal(ex, "Fatal exception in application entry point");
-                MessageBox.Show($"Fatal Error: {ex.Message}\nApplication is shutting down.", "Fatal Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            var app = new App();
+            app.InitializeComponent();
+            app.CheckForUpdatesAsync().GetAwaiter().GetResult();
+            app.Run();
         }
 
         public App()
         {
+            _logger.Info("***** PROGRAM STARTED *****");
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
             Services = ConfigureServices();
             // Subscribe to unobserved task exceptions
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         }
+
+        private async Task CheckForUpdatesAsync()
+        {
+            var updateManager = new UpdateManager(new GithubSource(
+                repoUrl: GetRepositoryUrl(),
+                accessToken: string.Empty,
+                prerelease: false,
+                downloader: null));
+
+            var update = await updateManager.CheckForUpdatesAsync();
+            if (update != null)
+            {
+                await updateManager.DownloadUpdatesAsync(update);
+                updateManager.ApplyUpdatesAndRestart(update);
+            }
+        }
+
+        private static string GetRepositoryUrl() => "https://github.com/HugeGo88/CvjmRechnung";
 
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
@@ -59,68 +68,6 @@ namespace CvjmRechnung
             // Subscribe to the DispatcherUnhandledException event
             this.DispatcherUnhandledException += App_DispatcherUnhandledException;
             base.OnStartup(e);
-            StartUpdateCheck();
-        }
-
-        private async Task CheckForUpdatesAsync()
-        {
-            try
-            {
-                var updateManager = new UpdateManager(new GithubSource(
-                    repoUrl: GetRepositoryUrl(),
-                    accessToken: string.Empty,
-                    prerelease: false,
-                    downloader: null));
-                if (!updateManager.IsInstalled)
-                {
-                    _logger.Info("Skipping update check because the app is not installed from a packaged release.");
-                    return;
-                }
-
-                var update = await updateManager.CheckForUpdatesAsync();
-                if (update is null)
-                {
-                    _logger.Info("No application update available.");
-                    return;
-                }
-
-                var result = MessageBox.Show(
-                    $"Version {update.TargetFullRelease.Version} ist verfügbar. Möchtest du das Update jetzt herunterladen und die App neu starten?",
-                    "Update verfügbar",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Information);
-
-                if (result != MessageBoxResult.Yes)
-                {
-                    _logger.Info("User skipped the available update.");
-                    return;
-                }
-
-                await updateManager.DownloadUpdatesAsync(update);
-                updateManager.ApplyUpdatesAndRestart(update);
-            }
-            catch (Exception ex)
-            {
-                _logger.Warn(ex, "Unable to check for updates.");
-            }
-        }
-
-        private void StartUpdateCheck()
-        {
-            _ = CheckForUpdatesAsync().ContinueWith(task =>
-            {
-                _logger.Warn(task.Exception, "Unexpected failure while checking for updates.");
-            }, TaskContinuationOptions.OnlyOnFaulted);
-        }
-
-        private static string GetRepositoryUrl()
-        {
-            return Assembly
-                .GetExecutingAssembly()
-                .GetCustomAttributes<AssemblyMetadataAttribute>()
-                .FirstOrDefault(attribute => attribute.Key == "RepositoryUrl")
-                ?.Value
-                ?? "https://github.com/HugeGo88/CvjmRechnung";
         }
 
         private void App_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
@@ -186,5 +133,4 @@ namespace CvjmRechnung
             }
         }
     }
-
 }
