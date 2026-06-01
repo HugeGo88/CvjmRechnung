@@ -12,6 +12,7 @@
     <FileVersion>0.1.0.0</FileVersion>
     <RepositoryUrl>https://github.com/HugeGo88/CvjmRechnung</RepositoryUrl>
     <VelopackVersion>1.1.1</VelopackVersion>
+    <VelopackPackId>CvjmRechnung</VelopackPackId>
     <Authors>HugeGo88</Authors>
     <Company>HugeGo88</Company>
     <Product>CvjmRechnung</Product>

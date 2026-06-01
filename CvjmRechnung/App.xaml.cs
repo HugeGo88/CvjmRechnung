@@ -54,19 +54,23 @@ namespace CvjmRechnung
             e.SetObserved();
         }
 
-        protected override async void OnStartup(StartupEventArgs e)
+        protected override void OnStartup(StartupEventArgs e)
         {
             // Subscribe to the DispatcherUnhandledException event
             this.DispatcherUnhandledException += App_DispatcherUnhandledException;
             base.OnStartup(e);
-            await CheckForUpdatesAsync();
+            StartUpdateCheck();
         }
 
         private async Task CheckForUpdatesAsync()
         {
             try
             {
-                var updateManager = new UpdateManager(new GithubSource(GetRepositoryUrl(), string.Empty, false, null));
+                var updateManager = new UpdateManager(new GithubSource(
+                    repoUrl: GetRepositoryUrl(),
+                    accessToken: string.Empty,
+                    prerelease: false,
+                    downloader: null));
                 if (!updateManager.IsInstalled)
                 {
                     _logger.Info("Skipping update check because the app is not installed from a packaged release.");
@@ -99,6 +103,14 @@ namespace CvjmRechnung
             {
                 _logger.Warn(ex, "Unable to check for updates.");
             }
+        }
+
+        private void StartUpdateCheck()
+        {
+            _ = CheckForUpdatesAsync().ContinueWith(task =>
+            {
+                _logger.Warn(task.Exception, "Unexpected failure while checking for updates.");
+            }, TaskContinuationOptions.OnlyOnFaulted);
         }
 
         private static string GetRepositoryUrl()
