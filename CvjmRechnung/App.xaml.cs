@@ -31,7 +31,7 @@ namespace CvjmRechnung
             }
             finally
             {
-                splashScreen.Close(TimeSpan.Zero);
+                splashScreen.Close(TimeSpan.FromMilliseconds(300));
             }
 
             app.Run();
