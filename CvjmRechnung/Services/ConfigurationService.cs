@@ -31,6 +31,13 @@ namespace CvjmRechnung.Services
 
         private ConfigurationData _data = new();
 
+        private bool _isLoaded = false;
+
+        public ConfigurationService()
+        {
+            Load();
+        }
+
         public string Password
         {
             get => _data.Password;
@@ -77,6 +84,7 @@ namespace CvjmRechnung.Services
                 {
                     SettingsRootPath = _configurationRootPath
                 };
+                _isLoaded = true;
                 return;
             }
 
@@ -91,10 +99,18 @@ namespace CvjmRechnung.Services
             _data.SelectedCssFile ??= "";
             _data.SelectedTemplateFile ??= "";
             _data.IcsPath ??= "";
+            _isLoaded = true;
         }
 
         public void Save()
         {
+            // Guard against overwriting a valid config file with empty data when Load() was never
+            // successfully called (e.g. if the process exits before the main window is shown).
+            if (!_isLoaded)
+            {
+                return;
+            }
+
             var settingsRootPath = string.IsNullOrWhiteSpace(_data.SettingsRootPath)
                 ? DefaultSettingsRootPath
                 : _data.SettingsRootPath.Trim();

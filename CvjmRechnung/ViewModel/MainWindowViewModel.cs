@@ -87,7 +87,6 @@ namespace CvjmRechnung.ViewModel
         {
             iMailClientService = mailClientService;
             iConfiguration = configuration;
-            iConfiguration.Load();
 
             SetInvoiceFolderFromConfiguration();
 
