@@ -22,7 +22,18 @@ namespace CvjmRechnung
 
             var app = new App();
             app.InitializeComponent();
-            app.CheckForUpdatesAsync().GetAwaiter().GetResult();
+            var splashScreen = new SplashScreen("Resources/logo.png");
+            splashScreen.Show(autoClose: false);
+
+            try
+            {
+                app.CheckForUpdatesAsync().GetAwaiter().GetResult();
+            }
+            finally
+            {
+                splashScreen.Close(TimeSpan.FromMilliseconds(300));
+            }
+
             app.Run();
         }
 
